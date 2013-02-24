@@ -1,0 +1,9 @@
+Title = "Stone - the static website generator that rocks !"
+
+Pages = [ ("index.md"      , "Overview");
+          ("get-it.md"     , "Get it");
+          ("specs.md"      , "Specs");
+          ("contribute.md" , "Contribute");
+          ("contact.md"    , "Contact") ]
+
+
