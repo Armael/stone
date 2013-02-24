@@ -16,14 +16,14 @@ let init_folder folder =
     Unix.mkdir (folder ^ site) dir_perm;
 
     (* Write the template and the css *)
-    dump_string (folder ^ data ^ template) Template_pak.text;
-    dump_string (folder ^ data ^ css) Style_pak.text;
+    dump_string file_perm (folder ^ data ^ template) Template_pak.text;
+    dump_string file_perm (folder ^ data ^ css) Style_pak.text;
 
     (* Write the default config file *)
-    dump_string (folder ^ config) Config_pak.text;
+    dump_string file_perm (folder ^ config) Config_pak.text;
 
     (* Write the example home page *)
-    dump_string (folder ^ pages ^ example_index) Example_index_pak.text
+    dump_string file_perm (folder ^ pages ^ example_index) Example_index_pak.text
   )
 
 let build_folder folder = 

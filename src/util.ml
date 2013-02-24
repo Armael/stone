@@ -2,8 +2,10 @@ let die msg =
   print_endline msg;
   exit 1
 
-let dump_string filename s =
-  let chan = open_out filename in
+let open_wr_flags = [Open_creat; Open_trunc; Open_text; Open_wronly]
+
+let dump_string perm filename s =
+  let chan = open_out_gen open_wr_flags perm filename in
   output_string chan s;
   close_out chan
 
@@ -15,9 +17,9 @@ let string_dump filename =
   close_in chan;
   s
 
-let copy_file f1 f2 =
+let copy_file perm f1 f2 =
   let c1 = open_in f1 in
-  let c2 = open_out f2 in
+  let c2 = open_out_gen open_wr_flags perm f2 in
   (try
     while true do
       output_string c2 ((input_line c1) ^ "\n")

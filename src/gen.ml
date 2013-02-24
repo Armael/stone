@@ -62,4 +62,4 @@ let page folder template conf filename =
     out_file := !out_file ^ dot ^ suffix;
     out_str := content);
       
-  dump_string !out_file !out_str
+  dump_string file_perm !out_file !out_str

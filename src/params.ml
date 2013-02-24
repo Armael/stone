@@ -20,3 +20,4 @@ and config = "/config.stone"
 and initialized_flag = "/.stone.initialized"
 
 let dir_perm = 0o751
+and file_perm = 0o644
