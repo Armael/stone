@@ -13,3 +13,9 @@ Title = "My awesome site"
 Pages = [ ("index.md", "Home") ]
 
 
+(* Advanced configuration variables        ------ *)
+(* You may not need to change them for the moment *)
+
+(* Permissions of the files & directories generated in site/ *)
+DirPerm  = 0o755
+FilePerm = 0o644

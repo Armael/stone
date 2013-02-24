@@ -48,9 +48,10 @@ let build_folder folder =
       all_pages;
 
     (* Copy the stylesheet into site/static/ *)
-    (try Unix.mkdir (folder ^ site ^ static) dir_perm
+    (try Unix.mkdir (folder ^ site ^ static) conf.Conf.dir_perm
      with Unix.Unix_error _ -> ());
-    copy_file (folder ^ data ^ css) (folder ^ site ^ static ^ css)
+    copy_file conf.Conf.file_perm (folder ^ data ^ css)
+      (folder ^ site ^ static ^ css)
   )
 
 let _ =
