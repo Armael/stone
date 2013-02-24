@@ -14,5 +14,5 @@ You have made a modification to *Stone* you are very proud of, and you
 want it to be integrated upsteam ? No problem ! You just have to :
 * Format your patches with `git format-patch`. Refer to the
   corresponding man page if needed.
-* Send me the patch via e-mail (armael AT isomorphis DOT me)
+* Send me the patch via [e-mail](contact.html)
 
