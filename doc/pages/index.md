@@ -57,6 +57,7 @@ directly browse its contents locally with your favorite browser.
 
 * For a more complete example, this documentation is written thanks to
   *Stone*. You can look at the [sources](contribute.html#h3-Sources).
-* Read the [specifications](specs.html) about the templates and the
-  relevant css properties, and make your own templates and themes.
+* Read the [specifications](specs.html) about the structure of the
+  project, the templates and the relevant css properties, and make
+  your own templates and themes.
 * Feel free to [contribute](contribute.html) !
