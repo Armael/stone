@@ -1,0 +1,15 @@
+(* The title of your website *)
+Title = "My awesome site"
+
+(* If you have more than one page, you can list them
+   separated by a semicolon. For example, if we have
+   the pages Home, Links, About, we can write :
+
+   Pages = [ ("index.md", "Home");
+             ("links.md", "Links");
+             ("about.md", "About") ]
+*)
+
+Pages = [ ("index.md", "Home") ]
+
+
