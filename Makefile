@@ -34,6 +34,7 @@ src/packed/style_pak.ml: packer
 
 packer:
 	$(CC) $(CFLAGS) -o $(PACKER) $(PACKER_SRC)
+	mkdir -p src/packed
 
 $(PACKED_SRC):
 
