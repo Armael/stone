@@ -1,0 +1,16 @@
+Stone
+=====
+
+To build Stone, you need ocaml and the following dependancies :
+
+- config-file
+- cow
+
+It is highly recommended to install them from the ocamlpro's Opam
+package manager (http://opam.ocamlpro.com/).
+
+Then, just run `make` to build stone's binary, so you can build the
+complete html documentation by typing `./stone doc/`.
+
+Now, just open the doc/site/index.html page with your favorite web
+browser !
