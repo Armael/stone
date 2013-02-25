@@ -23,8 +23,8 @@ Type `stone --help` to have some explanations on how to use the
 binary : let's first generate a default website:
 
 {{
-    ./stone -i my_portfolio
-    ls my_portfolio
+    ./stone -i my-portfolio
+    ls my-portfolio
 }}
 
 As you can see, a directory has been initialized with a default
@@ -44,8 +44,8 @@ You can now tweak the `config.stone` a little, write things in
 the html content:
 
 {{
-    ./stone my_portfolio
-    ls my_portfolio
+    ./stone my-portfolio
+    ls my-portfolio
 }}
 
 A new directory as appeared: `site`. It contains the html pages,
