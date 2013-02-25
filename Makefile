@@ -20,6 +20,9 @@ all: stone
 stone: $(PACKED)
 	$(CC) -package $(PACKAGES) -syntax $(PP) $(CFLAGS) -o $@ $(PACKED) $(SRC) 
 
+doc: stone
+	./stone doc/
+
 src/packed/config_pak.ml: packer
 	$(PACKER) data/config.stone src/packed/config_pak.ml
 
@@ -50,3 +53,4 @@ mproper: clean
 	rm -rf stone
 	rm -rf $(PACKER)
 	rm -rf $(PACKED)
+	rm -rf doc/site/*
