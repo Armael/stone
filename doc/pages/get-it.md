@@ -13,25 +13,25 @@ the required libraries.
 
 Once OPAM is initialized, install the two required libraries
  ([Cow](https://github.com/mirage/ocaml-cow) and
- [Config_file](http://config-file.forge.ocamlcore.org/)) :
+ [Config_file](http://config-file.forge.ocamlcore.org/)):
  
  {{
      opam install cow config-file
  }}
 
 Now that we have setup the compilation environnment, we can get
-*Stone* sources' :
+*Stone* sources':
 
 {{
     git clone git://git.isomorphis.me/stone.git
 }}
 
-And then, build them : 
+And then, build them:
 {{
     cd stone/
     make
     cd ..
 }}
 
-That's it ! Now you have a binary named `stone` in the `stone` folder
-(how surprising !).
+That's it! Now you have a binary named `stone` in the `stone` folder
+(how surprising!).
