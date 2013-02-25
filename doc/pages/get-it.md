@@ -29,6 +29,7 @@ Now that we have setup the compilation environnment, we can get
 And then, build them:
 {{
     cd stone/
+    ./configure
     make
     cd ..
 }}
