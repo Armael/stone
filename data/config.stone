@@ -17,5 +17,5 @@ Pages = [ ("index.md", "Home") ]
 (* You may not need to change them for the moment *)
 
 (* Permissions of the files & directories generated in site/ *)
-DirPerm  = 0o755
-FilePerm = 0o644
+DirPerm  = 493 (* 0o755 *)
+FilePerm = 420 (* 0o644 *)
