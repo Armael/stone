@@ -1,3 +1,7 @@
+(* Copyright (c) 2013 Armaël Guéneau
+
+   See the file LICENSE for copying permission.
+*)
 
 let die msg =
   print_string msg;

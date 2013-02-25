@@ -1,3 +1,8 @@
+(* Copyright (c) 2013 Armaël Guéneau
+
+   See the file LICENSE for copying permission.
+*)
+
 let usage = 
 "Usage : stone [OPTIONS] [FOLDER]
 Manage a stone static website located in FOLDER.
