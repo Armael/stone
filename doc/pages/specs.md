@@ -28,8 +28,9 @@ bar, and other things.
   as markdown (see below) and generated using the template. Otherwise
   they will be copied without modification.
 
-After running `stone` and generating the static pages, a new directory
-appears:
+After running `stone`, the static pages are generated in a new
+directory :
+
 {{
     └── site
         ├── index.html
@@ -43,10 +44,9 @@ send online to be served by your web server.
 ### Pages syntax
 
 *Stone*'s pages are written in a easy-to-read and easy-to-write
-formatting syntax: Markdown. In fact, Markdown-like: the parser I
-use doesn't implements standard Markdown on some points (you can send
-patches to [Cow](https://github.com/mirage/ocaml-cow), i would be
-happy).
+formatting syntax: Markdown. Actually, Markdown-like: the parser I use
+doesn't implement the whole standard Markdown (you can send patches to
+[Cow](https://github.com/mirage/ocaml-cow), i would be happy).
 
 You can have a look at the Markdown specification
 [here](http://daringfireball.net/projects/markdown/syntax) or at a
@@ -57,13 +57,13 @@ The differences between the imprementation used by *Stone* and the
 standard are:
 
 * Headings underlined by '`-`'s and '`=`'s are not supported (use '`#`'s)
-* Trailing spaces to put a line break are not supported
+* Trailing spaces to insert a line break are not supported
 * Code blocks must start with '`{{`' and end with '`}}`'
 
 ### Template
 
-Templates for *Stone* are just plain html pages, with some magic
-variables that will be replaced during the pages generation.
+*Stone* templates are just plain html pages, with some magic variables
+that will be replaced during the pages generation.
 
 The variables you can use are the following:
 
@@ -87,11 +87,11 @@ template.
 
 ### Generated pages properties
 
-* When you create a heading (with some '`#`'s), an anchor is created. It
-  is named with the following pattern: if this is a `h3` title, with text `"My
+* When you create a heading (with some '`#`'s), an anchor is created. Its
+  name is defined by the following method: if this is a `h3` title, with text `"My
   Title"`, the anchor's name will be `"h3-MyTitle"`.
-  It also has class `"anchor-toc"`.
-* The `li` item in the bar list which points out to the current page
-  has the css class `current`. So in the bar of the specs page (for
+  It also has class the `"anchor-toc"`.
+* The `li` item in the bar list corresponding to the current page has
+  the css class `current`. So in the bar of the specs page (for
   example), there is `<li class="current"><a href="specs.html">
   ... </li>`.
