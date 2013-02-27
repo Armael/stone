@@ -22,12 +22,12 @@ bar, and other things.
   + `template.html`: the template used for markdown pages. See below.
   
   + `style.css`: The stylesheet. The default one is made by
-    [Theotix](http://theotix.me) (thanks to him).
+    [Theotix](http://theotix.me) (Thanks!).
 * The `pages` directory is where you write the pages with your
   content. If the extension is `.md` or `.markdown`, they'll be parsed
   as markdown (see below) and generated using the template. Otherwise
-  they will be just copied without modification.
-  
+  they will be copied without modification.
+
 After running `stone` and generating the static pages, a new directory
 appears:
 {{

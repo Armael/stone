@@ -4,7 +4,7 @@
  stylesheet, the content itself written in a high-level formatting
  syntax, and generates the corresponding html pages.
  
- However, *Stone* isn't a generalistic one: his goal is to provide a
+ However, *Stone* isn't a generalistic one: its goal is to provide a
  very easy way to generate simple websites like a portfolio, or the
  pages of documentation for a small project. That is quite limitated,
  but *Stone* tries to be good at what it aims.
@@ -13,11 +13,11 @@
 
 So, let's generate our first *Stone*-based website!
 
-First, [get Stone](get-it.html). That's the more complicated step of
+First, [get Stone](get-it.html). That's the most complicated step of
 the process.
 
-You now have a `stone` binary. You can put it where you want, it is
-self-sufficient. I will here assume it is in the current folder.
+You now have a `stone` binary. You can put it whereever you want, it
+is self-sufficient. I will here assume it is in the current folder.
 
 Type `stone --help` to have some explanations on how to use the
 binary : let's first generate a default website:
