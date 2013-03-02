@@ -40,18 +40,20 @@ let list_of_array a =
   done;
   !l
 
+let (/^) a b = Filename.concat a b
+
 (* Return the list of all the files in a given directory, with
    their relative path into the directory. *)
 let explore_directory dir =
-  let root = dir ^ "/" in
+  let root = dir in
 
   let rec aux prefix = 
     let files = ref [] in
-    let content = Sys.readdir (root ^ prefix) in
+    let content = Sys.readdir (root /^ prefix) in
     Array.iter (fun it ->
-      let it = prefix ^ it in
-      if Sys.is_directory (root ^ it) then
-        files := (aux (it ^ "/")) @ !files
+      let it = prefix /^ it in
+      if Sys.is_directory (root /^ it) then
+        files := (aux it) @ !files
       else
         files := it :: !files
     ) content;
@@ -61,7 +63,7 @@ let explore_directory dir =
 let rec remove_directory dir =
   let files = Sys.readdir dir in
   for i = 0 to Array.length files - 1 do
-    let f = dir ^ "/" ^ files.(i) in
+    let f = dir /^ files.(i) in
     if Sys.is_directory f then
       remove_directory f
     else
@@ -76,57 +78,41 @@ let try_mkdir name perm =
 
 (* Creates all the folders needed to write in path.
    Similar to a 'mkdir -p'. *)
-let mkpath path perm = 
-  let i = ref 0 in
-  try
-    while true do
-      let j = String.index_from path !i '/' in
-      try_mkdir (String.sub path 0 j) perm;
-      i := j+1
-    done
-  with Not_found -> try_mkdir path perm
+let rec mkpath path perm =
+  if path <> Filename.current_dir_name then (
+    mkpath (Filename.dirname path) perm;
+    try_mkdir path perm
+  )
 
 (* Count the number of folders in the given path.
 
    Example : /foo/ -> 1
              foo/bar/baz -> 3
              foo/bar//baz -> 3
+             foo -> 1
+             . -> 0
 *)
 let depth path =
-  let d = ref 0 in
-  let start = 0 in
-  let end' = (String.length path - 1) in
-  let succ = ref false in
-
-  if start <= end' then (
-    if path.[start] = '/' then
-      decr d;
-    if path.[end'] <> '/' then
-      incr d;
-  );
-
-  for i = start to end' do
-    if path.[i] = '/' then (
-      if not !succ then (
-        d := !d + 1;
-        succ := true
-      )
-    ) else (
-      succ := false
-    )
+  let depth = ref 0 in
+  let path = ref path in
+  while Filename.dirname !path <> !path do
+    path := Filename.dirname !path;
+    incr depth
   done;
-  !d
+  !depth
 
 (* Generate a path to depth number of folder backwards.
 
    Example : 3 -> ../../../
 *)
 let gen_backpath depth =
-  let path = String.create (depth + (2 * depth)) in
+  let parent_len = String.length Filename.parent_dir_name in
+  let sep_len = String.length Filename.dir_sep in
+  let back_len = parent_len + sep_len in
+  let path = String.create (depth * back_len) in
   for i = 0 to depth - 1 do
-    path.[3*i] <- '.';
-    path.[3*i+1] <- '.';
-    path.[3*i+2] <- '/'
+    String.blit Filename.parent_dir_name 0 path (back_len * i) parent_len;
+    String.blit Filename.dir_sep 0 path (back_len * i + parent_len) sep_len;
   done;
   path
     
