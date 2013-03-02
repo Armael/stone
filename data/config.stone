@@ -20,6 +20,11 @@ Pages = [ ("index.md", "Home") ]
 (* Advanced configuration variables        ------ *)
 (* You may not need to change them for the moment *)
 
+Exports = [
+  (".embed.html", "cat %{file}%");
+  (".org", "mlorg --set exporters.html.wrap=false --output - --backend html %{file}%")
+]
+
 (* Permissions of the files & directories generated in site/ *)
 DirPerm  = 493 (* 0o755 *)
 FilePerm = 420 (* 0o644 *)

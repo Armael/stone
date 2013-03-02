@@ -47,9 +47,13 @@ let build_folder folder =
     (* Open the template file once *)
     let template_str = string_dump (folder /^ data /^ template) in
 
+    (* Found target name for each page we'll have to generate.
+       The result is an association list. *)
+    let targets = Gen.targets conf all_pages in
+
     (* Generate all the pages in /pages/ and its subdirectories *)
     List.iter (fun page -> 
-      Gen.page folder template_str conf page)
+      Gen.page folder template_str conf targets page)
       all_pages;
 
     (* Copy the stylesheet into site/static/ *)

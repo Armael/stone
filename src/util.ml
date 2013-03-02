@@ -127,30 +127,6 @@ let gen_backpath depth =
     String.blit Filename.dir_sep 0 path (back_len * i + parent_len) sep_len;
   done;
   path
-    
-(* Split an absolute filename into three strings :
-   - the path to the file
-   - the prefix of the file (name without extension)
-   - the dot (if present)
-   - the extension (suffix) (if present)
-
-   For example : 
-   "/home/toto/note.txt" -> ("/home/toto", "note", ".", "txt")
-   "/home/toto/bla" -> ("/home/toto", "bla", "", "")
-*)
-let fname_split filename =
-  let path_prefix, dot, suffix =
-    try let n = String.rindex filename '.' in
-        (String.sub filename 0 n,
-         ".",
-         String.sub filename (n+1) (String.length filename - n - 1))
-    with _ -> (filename, "", "") in
-  let path, prefix =
-    try let n = String.rindex path_prefix '/' in
-        (String.sub path_prefix 0 n,
-         String.sub path_prefix (n+1) (String.length path_prefix - n - 1))
-    with _ -> ("", path_prefix) in
-  (path, prefix, dot, suffix)
 
 let (|>) x f = f x
 let (@@) f x = f x

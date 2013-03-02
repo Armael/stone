@@ -13,6 +13,7 @@ type page = {
 type config = {
   site_title : string;
   bar_pages : page list;
+  exports : (string * string) list;
   dir_perm : int;
   file_perm : int
 }
@@ -24,6 +25,10 @@ let parse_conf filename =
     (tuple2_wrappers string_wrappers string_wrappers)
     ~group
     ["Pages"] [] "List of the pages" in
+  let exports = new list_cp
+    (tuple2_wrappers string_wrappers string_wrappers)
+    ~group
+    ["Exports"] [] "Custom exporters (to html) for source files" in
   let dir_perm = new int_cp ~group ["DirPerm"] Params.dir_perm
     "Permission for the created directories" in
   let file_perm = new int_cp ~group ["FilePerm"] Params.file_perm
@@ -32,6 +37,7 @@ let parse_conf filename =
   group#read filename;
   { site_title = title#get;
     bar_pages = List.map (fun (f, t) -> { file = f; title = t }) pages#get;
+    exports = exports#get;
     dir_perm = dir_perm#get;
     file_perm = file_perm#get
   }
