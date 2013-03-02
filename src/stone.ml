@@ -16,36 +16,36 @@ let init_folder folder =
     (* Create folders : data contains the template and the css,
        pages contains the contents, written in Markdown or html,
        site will contain the generated pages *)
-    Unix.mkdir (folder ^ data) dir_perm;
-    Unix.mkdir (folder ^ pages) dir_perm;
-    Unix.mkdir (folder ^ site) dir_perm;
+    Unix.mkdir (folder /^ data) dir_perm;
+    Unix.mkdir (folder /^ pages) dir_perm;
+    Unix.mkdir (folder /^ site) dir_perm;
 
     (* Write the template and the css *)
-    dump_string file_perm (folder ^ data ^ template) Template_pak.text;
-    dump_string file_perm (folder ^ data ^ css) Style_pak.text;
+    dump_string file_perm (folder /^ data /^ template) Template_pak.text;
+    dump_string file_perm (folder /^ data /^ css) Style_pak.text;
 
     (* Write the default config file *)
-    dump_string file_perm (folder ^ config) Config_pak.text;
+    dump_string file_perm (folder /^ config) Config_pak.text;
 
     (* Write the example home page *)
-    dump_string file_perm (folder ^ pages ^ example_index) Example_index_pak.text
+    dump_string file_perm (folder /^ pages /^ example_index) Example_index_pak.text
   )
 
 let build_folder folder = 
   (* We assume that everything will be okay (the templates & css
      will be here) as long as the config file is present *)
-  if not (Sys.file_exists (folder ^ config)) then (
+  if not (Sys.file_exists (folder /^ config)) then (
     print_endline (folder ^
                      " isn't a Stone repository or isn't properly initialized");
   ) else (
-    let conf = Conf.parse_conf (folder ^ config) in
+    let conf = Conf.parse_conf (folder /^ config) in
     (* We will generate all pages in /pages/, even if some are not
        listed in the header bar.
        We also explore the subdirectories. *)
-    let all_pages = explore_directory (folder ^ pages) in
+    let all_pages = explore_directory (folder /^ pages) in
 
     (* Open the template file once *)
-    let template_str = string_dump (folder ^ data ^ template) in
+    let template_str = string_dump (folder /^ data /^ template) in
 
     (* Generate all the pages in /pages/ and its subdirectories *)
     List.iter (fun page -> 
@@ -53,10 +53,10 @@ let build_folder folder =
       all_pages;
 
     (* Copy the stylesheet into site/static/ *)
-    (try Unix.mkdir (folder ^ site ^ static) conf.Conf.dir_perm
+    (try Unix.mkdir (folder /^ site /^ static) conf.Conf.dir_perm
      with Unix.Unix_error _ -> ());
-    copy_file conf.Conf.file_perm (folder ^ data ^ css)
-      (folder ^ site ^ static ^ css)
+    copy_file conf.Conf.file_perm (folder /^ data /^ css)
+      (folder /^ site /^ static /^ css)
   )
 
 let _ =
@@ -69,7 +69,7 @@ let _ =
     "-i"    , Arg.Unit (fun () -> init := true), " Setup a new static website in FOLDER";
     "-c"    , Arg.Unit (fun () -> clean := true), " Clean FOLDER : remove the generated \
 pages (in site/)"
-  ] (fun dir -> folders := (dir ^ "/") :: !folders)
+  ] (fun dir -> folders := dir :: !folders)
     "Usage : stone [OPTIONS] [FOLDER]...
 Manage stone static websites located in the given FOLDERs.
 If no FOLDER is specified, the current directory is used.
@@ -77,7 +77,7 @@ The action specified by the option is applied to all the folders\n
   no option  Build the static pages (in a directory initialized with -i)";
   
   if !folders = [] then
-    folders := ["./"];
+    folders := ["."];
   
   List.iter (fun folder ->
     if !init then (
@@ -89,7 +89,7 @@ The action specified by the option is applied to all the folders\n
       else
         init_folder folder
     ) else if !clean then (
-      remove_directory (folder ^ site)
+      remove_directory (folder /^ site)
     ) else (
       build_folder folder
     )) !folders
