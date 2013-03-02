@@ -2,7 +2,7 @@
 
 BIN_DIR="."
 
-if [ "$1" == "--bin-dir" ]; then
+if [ "$1" = "--bin-dir" ]; then
     BIN_DIR="$2"
 fi
 
