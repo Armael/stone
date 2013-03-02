@@ -43,7 +43,7 @@ let targets conf pages =
     with Not_found -> targets
   ) [] pages
 
-let bar ?current bar_pages targets =
+let bar ?current bar_pages backpath targets =
   let open Conf in
   let maybe_equal opt x = match opt with
     | None -> false
@@ -53,6 +53,7 @@ let bar ?current bar_pages targets =
       (try
         fst (List.assoc f targets)
        with Not_found -> f) in
+    let link = backpath /^ link in
     if maybe_equal current f then (
       <:xml<
         <li class="current"><a href="$str:link$">$str:t$</a></li>
@@ -73,6 +74,7 @@ let page folder template conf targets filename =
   let open Conf in
   let prefix = filename |> Filename.basename |> Filename.chop_extension in
   let filepath = filename |> Filename.dirname in
+  let backpath = gen_backpath (depth filepath) in
 
   let in_file = folder /^ pages /^ filename in
   try
@@ -93,12 +95,12 @@ let page folder template conf targets filename =
     let page_title = match bar_item with
       | Some it -> it.title
       | None -> prefix in
-    let css_path = (gen_backpath (depth filepath)) /^ static /^ css in
+    let css_path = backpath  /^ static /^ css in
     let css = <:xml<<link href=$str:css_path$ type="text/css" rel="stylesheet"/> >> in
     let html_page = Template.fill template
       conf.site_title page_title
       css
-      (bar ?current conf.bar_pages targets)
+      (bar ?current conf.bar_pages backpath targets)
       html_content in
     let out_str = (try Html.to_string html_page with
       Parsing.Parse_error -> die ("Error : unable to generate page " ^ in_file)) in
