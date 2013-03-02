@@ -8,6 +8,7 @@ let die msg =
   exit 1
 
 let open_wr_flags = [Open_creat; Open_trunc; Open_text; Open_wronly]
+let open_wr_bin_flags = [Open_creat; Open_trunc; Open_binary; Open_wronly]
 
 let dump_string perm filename s =
   let chan = open_out_gen open_wr_flags perm filename in
@@ -29,6 +30,17 @@ let copy_file perm f1 f2 =
     while true do
       output_string c2 ((input_line c1) ^ "\n")
     done
+   with End_of_file -> ());
+  close_in c1;
+  close_out c2
+
+let copy_bin_file perm f1 f2 =
+  let c1 = open_in_bin f1 in
+  let c2 = open_out_gen open_wr_bin_flags perm f2 in
+  (try
+     while true do
+       output_byte c2 (input_byte c1)
+     done
    with End_of_file -> ());
   close_in c1;
   close_out c2
@@ -141,3 +153,5 @@ let fname_split filename =
   (path, prefix, dot, suffix)
 
 let (|>) x f = f x
+let (@@) f x = f x
+let (%) f g = fun x -> f (g x)
