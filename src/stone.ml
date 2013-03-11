@@ -20,8 +20,9 @@ let init_folder folder =
     Unix.mkdir (folder /^ pages) dir_perm;
     Unix.mkdir (folder /^ site) dir_perm;
 
-    (* Write the template and the css *)
-    dump_string file_perm (folder /^ data /^ template) Template_pak.text;
+    (* Write the templates and the css *)
+    dump_string file_perm (folder /^ data /^ default_template) Template_pak.text;
+    dump_string file_perm (folder /^ data /^ org_template) Org_template_pak.text;
     dump_string file_perm (folder /^ data /^ css) Style_pak.text;
 
     (* Write the default config file *)
@@ -44,15 +45,25 @@ let build_folder folder =
        We also explore the subdirectories. *)
     let all_pages = explore_directory (folder /^ pages) in
 
-    (* Open the template file once *)
-    let template_str = string_dump (folder /^ data /^ template) in
+    (* Open the templates file once
+       The result is an association list (template filename -> content) *)
+    let templates_str = List.map
+      (fun tpl -> (tpl, string_dump (folder /^ data /^ tpl)))
+      (default_template
+       :: org_template
+       :: (List.map snd conf.Conf.pages_templates)) in
 
     (* Found target name for each page we'll have to generate.
        The result is an association list. *)
     let targets = Gen.targets conf all_pages in
 
     (* Generate all the pages in /pages/ and its subdirectories *)
-    List.iter (fun page -> 
+    List.iter (fun page ->
+      let template_filename =
+        try List.assoc page conf.Conf.pages_templates with
+          Not_found -> default_template in
+      let template_str = List.assoc template_filename templates_str in
+
       Gen.page folder template_str conf targets page)
       all_pages;
 

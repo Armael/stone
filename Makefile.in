@@ -11,7 +11,7 @@ PACKER_SRC := $(patsubst %,src/%,$(PACKER_SRC))
 
 PACKER := $(patsubst %.ml,%,$(PACKER_SRC))
 
-PACKED_NAMES := config.stone example_index.md template.html style.css
+PACKED_NAMES := config.stone example_index.md template.html org_template.html style.css
 PACKED := $(addsuffix _pak.ml, $(basename $(PACKED_NAMES)))
 PACKED := $(patsubst %,src/packed/%,$(PACKED))
 
@@ -31,6 +31,9 @@ src/packed/example_index_pak.ml: packer
 
 src/packed/template_pak.ml: packer
 	$(PACKER) data/template.html src/packed/template_pak.ml
+
+src/packed/org_template_pak.ml: packer
+	$(PACKER) data/org_template.html src/packed/org_template_pak.ml
 
 src/packed/style_pak.ml: packer
 	$(PACKER) data/style.css src/packed/style_pak.ml

@@ -14,6 +14,8 @@ type config = {
   site_title : string;
   bar_pages : page list;
   exports : (string * string) list;
+  default_template : string;
+  pages_templates : (string * string) list;
   dir_perm : int;
   file_perm : int
 }
@@ -29,6 +31,15 @@ let parse_conf filename =
     (tuple2_wrappers string_wrappers string_wrappers)
     ~group
     ["Exports"] [] "Custom exporters (to html) for source files" in
+  let default_template = new string_cp
+    ~group
+    ["DefaultTemplate"]
+    "template.html"
+    "The default html template to use" in
+  let pages_templates = new list_cp
+    (tuple2_wrappers string_wrappers string_wrappers)
+    ~group
+    ["PagesTemplates"] [] "List of couples (page, template to use)" in
   let dir_perm = new int_cp ~group ["DirPerm"] Params.dir_perm
     "Permission for the created directories" in
   let file_perm = new int_cp ~group ["FilePerm"] Params.file_perm
@@ -38,6 +49,8 @@ let parse_conf filename =
   { site_title = title#get;
     bar_pages = List.map (fun (f, t) -> { file = f; title = t }) pages#get;
     exports = exports#get;
+    default_template = default_template#get;
+    pages_templates = pages_templates#get;
     dir_perm = dir_perm#get;
     file_perm = file_perm#get
   }
