@@ -60,7 +60,14 @@ let build_folder folder =
     (* Generate all the pages in /pages/ and its subdirectories *)
     List.iter (fun page ->
       let template_filename =
-        try List.assoc page conf.Conf.pages_templates with
+        try
+          List.find (fun (r,_) ->
+            let regexp = Str.regexp r in
+            (Str.string_match regexp page 0
+             && Str.matched_string page = page)
+          ) conf.Conf.pages_templates
+          |> snd
+        with
           Not_found -> default_template in
       let template_str = List.assoc template_filename templates_str in
 
