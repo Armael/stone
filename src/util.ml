@@ -128,6 +128,16 @@ let gen_backpath depth =
   done;
   path
 
+let rec map_some f = function
+  | [] -> []
+  | x::xs -> match f x with
+    | None -> map_some f xs
+    | Some y -> y::(map_some f xs)
+
+let option_map f = function
+  | None -> None
+  | Some x -> Some (f x)
+
 let (|>) x f = f x
 let (@@) f x = f x
 let (%) f g = fun x -> f (g x)

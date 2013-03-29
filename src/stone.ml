@@ -47,8 +47,13 @@ let build_folder folder =
 
     (* Open the templates file once
        The result is an association list (template filename -> content) *)
-    let templates_str = List.map
-      (fun tpl -> (tpl, string_dump (folder /^ data /^ tpl)))
+    let try_string_dump s =
+      try Some (string_dump s)  with
+        Sys_error _ -> None in
+    let templates_str = map_some
+      (fun tpl -> option_map
+        (fun dump -> (tpl, dump))
+        (try_string_dump (folder /^ data /^ tpl)))
       (default_template
        :: org_template
        :: (List.map snd conf.Conf.pages_templates)) in
