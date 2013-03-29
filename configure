@@ -9,7 +9,7 @@ fi
 cp Makefile.in Makefile
 
 if [ "$BIN_DIR" != "." ]; then
-    echo "
+    printf "
 install: stone
 \tcp stone $BIN_DIR/
 
