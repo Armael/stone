@@ -17,15 +17,13 @@ project. It defines it's name, the pages you want to have in the title
 bar, and other things.
 * The `data` directory contains the static content used to generate
   the pages:
-
-  + `template.html`: the template used for markdown pages. See below.
-  
-  + `style.css`: The stylesheet. The default one is made by
+  - `template.html`: the default template.
+  - `org-template.html`: a template for org-mode pages exported by mlorg.
+  - `style.css`: The stylesheet. The default one is made by
     [Theotix](http://theotix.me) (Thanks!).
 * The `pages` directory is where you write the pages with your
-  content. If the extension is `.md` or `.markdown`, they'll be parsed
-  as markdown (see below) and generated using the template. Otherwise
-  they will be copied without modification.
+  content. They are processed by the exporters, then inserted into a
+  template.
 
 After running `stone`, the static pages are generated in a new
 directory :
@@ -38,17 +36,41 @@ directory :
 The `site` directory contains the generated content: what you want to
 send online to be served by your web server.
 
-### Pages syntax
+### Exporters
 
-*Stone*'s pages are written in a easy-to-read and easy-to-write
-formatting syntax: Markdown.
+Pages content is processed by exporters, to obtain from some syntax
+the html code to insert in a template.
 
-You can have a look at the Markdown specification
-[here](http://daringfireball.net/projects/markdown/syntax) or at a
-recap
-[here](http://support.mashery.com/docs/customizing_your_portal/Markdown_Cheat_Sheet)
+By default, a built-in markdown exporter is provided, which handle
+files with extensions `.md` and `.markdown`. Consequently, you can
+write pages in markdown out of the box. If you don't know the markdown
+syntax yet, you can have a look at its
+[specification](http://daringfireball.net/projects/markdown/syntax) or
+at a
+[recap](http://support.mashery.com/docs/customizing_your_portal/Markdown_Cheat_Sheet).
 
-### Template
+You can also specify custom exporters, that may override the built-in
+one(s), using the `Exporters` variable of the `config.stone` file. An
+exporter is stored as a couple of the extension of the files to
+handle, and an external command to convert pages to html. There are
+more details in the default `config.stone`.
+
+If, for a given file in the `pages` directory, no exporter is found,
+it is copyied as is.
+
+### Templates
+
+After being processed by an exporter, the content of a page is
+inserted into a template. The default template is `template.html`, as
+indicated by the `DefaultTemplate` variable of the `config.stone`.
+
+You can also specify custom templates: the `PagesTemplates` variable
+(in `config.stone`) specify a list of custom templates, composed by a
+couple of a regexp that matches the files that must use the template,
+and the filename of the template itself. There are more details in the
+default `config.stone`.
+
+### Writing custom templates
 
 *Stone* templates are just plain html pages, with some magic variables
 that will be replaced during the pages generation.
@@ -78,7 +100,7 @@ template.
 * When you create a heading (with some '`#`'s), an anchor is
   created. Its name can be determined by removing the blanks from the
   text of the heading. A title with text `"My Title"` will have an
-  anchor named `"MyTitle"`.  It also has class the `"anchor-toc"`.
+  anchor named `"MyTitle"`.
 * The `li` item in the bar list corresponding to the current page has
   the css class `current`. So in the bar of the specs page (for
   example), there is
