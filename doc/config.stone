@@ -6,4 +6,12 @@ Pages = [ ("index.md"      , "Overview");
           ("contribute.md" , "Contribute");
           ("contact.md"    , "Contact") ]
 
+(* Advanced configuration variables        ------ *)
 
+Exports = []
+PagesTemplates = []
+
+DefaultTemplate = "template.html"
+
+DirPerm  = 493 (* 0o755 *)
+FilePerm = 420 (* 0o644 *)
