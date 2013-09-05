@@ -27,8 +27,11 @@ let custom_exporter command = fun file ->
 
 let markdown_exporter = fun file ->
   string_dump file
-  |> Markdown_github.of_string
-  |> Markdown.to_html
+  |> Omd.lex
+  |> Omd.parse
+  |> Omd.make_paragraphs
+  |> Omd.to_html
+  |> Html.of_string
 
 let targets conf pages =
   let exports =

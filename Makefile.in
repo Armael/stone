@@ -1,5 +1,5 @@
 CC := ocamlfind ocamlc
-PACKAGES := cow,cow.syntax,config-file,unix,str
+PACKAGES := cow,cow.syntax,config-file,omd,unix,str
 PP := camlp4o
 CFLAGS := -linkpkg -I src/ -I src/packed/
 
