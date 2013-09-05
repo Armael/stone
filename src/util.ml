@@ -52,6 +52,30 @@ let list_of_array a =
   done;
   !l
 
+let reduce f = function
+  | [] -> raise (Invalid_argument "Empty list")
+  | x::xs -> List.fold_left f x xs
+
+(* Code from ocaml batteries included *)
+let interleave ?first ?last (sep:'a) (l:'a list) =
+  let rec aux acc = function
+    | [] -> acc
+    | h::t -> aux (h::sep::acc) t
+  in
+  match (l,first, last) with
+  | ([], None, None) -> []
+  | ([], None, Some x) -> [x]
+  | ([], Some x, None) -> [x]
+  | ([], Some x, Some y) -> [x;y]
+  | ([h], None, None) -> [h]
+  | ([h], None, Some x) -> [h;x]
+  | ([h], Some x, None) -> [x;h]
+  | ([h], Some x, Some y) -> [x;h;y]
+  | (h::t, None , None ) -> List.rev (aux [h] t)
+  | (h::t, Some x, None ) -> x::(List.rev (aux [h] t))
+  | (h::t, None, Some y) -> List.rev_append (aux [h] t) [y]
+  | (h::t, Some x, Some y) -> x::List.rev_append (aux [h] t) [y]
+
 let (/^) a b = Filename.concat a b
 
 (* Return the list of all the files in a given directory, with
