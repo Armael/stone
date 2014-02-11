@@ -27,9 +27,7 @@ let custom_exporter command = fun file ->
 
 let markdown_exporter = fun file ->
   string_dump file
-  |> Omd_lexer.lex
-  |> Omd_parser.parse
-  |> Omd_parser.make_paragraphs
+  |> Omd.of_string
   |> Omd.to_html
   |> Html.of_string
 
