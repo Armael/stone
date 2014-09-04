@@ -115,7 +115,13 @@ let try_mkdir name perm =
 (* Creates all the folders needed to write in path.
    Similar to a 'mkdir -p'. *)
 let rec mkpath path perm =
-  if path <> Filename.current_dir_name then (
+  let continue =
+    if Filename.is_relative path then
+      path <> Filename.current_dir_name
+    else
+      path <> Sys.getcwd ()
+  in
+  if continue then (
     mkpath (Filename.dirname path) perm;
     try_mkdir path perm
   )
