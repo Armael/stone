@@ -114,9 +114,9 @@ let try_mkdir name perm =
 
 (* Creates all the folders needed to write in path.
    Similar to a 'mkdir -p'. *)
-let rec mkpath path =
+let rec mkpath path perm =
   if not (Sys.file_exists path) then (
-    mkpath (Filename.dirname path);
+    mkpath (Filename.dirname path) perm;
     try_mkdir path perm
   )
 
