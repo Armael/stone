@@ -9,7 +9,7 @@
 
 Once `opam` is initialized, just type:
 
-   opam install stone
+    opam install stone
 
 
 Now, the `stone` command is available.
