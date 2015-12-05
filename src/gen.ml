@@ -109,4 +109,6 @@ let page folder template conf targets filename =
 
   with Not_found ->
     let out_file = folder /^ site /^ filename in
+    let out_path = Filename.dirname out_file in
+    mkpath out_path dir_perm;
     copy_bin_file conf.file_perm in_file out_file
