@@ -12,6 +12,8 @@ let get_data filename =
   | None -> die (Printf.sprintf "Data file not found : %s" filename)
   | Some s -> s
 
+(* Initializes a new stone project, with default files.
+*)
 let init_folder folder =
   (* Check if the given folder is empty, if not, do nothing *)
   if Array.length (Sys.readdir folder) > 0 then (
@@ -37,6 +39,8 @@ let init_folder folder =
     dump_string file_perm (folder /^ pages /^ example_index) (get_data "example_index.md");
   )
 
+(* Rebuild a stone project, regenerating the contents of site/
+*)
 let build_folder folder =
   (* We assume that everything will be okay (the templates & css
      will be here) as long as the config file is present *)
@@ -91,6 +95,9 @@ let build_folder folder =
       (folder /^ site /^ static /^ css)
   )
 
+(* Watcher mode, looking for changes in data, pages or config, using inotify,
+   and rebuilding when it happens.
+*)
 type rel_path = string
 type handler = Inotify.event -> rel_path -> unit
 
@@ -219,7 +226,6 @@ let watch_stone_folders folders =
   done
 
 let () =
-
   let init = ref false in
   let clean = ref false in
   let watch_mode = ref false in
