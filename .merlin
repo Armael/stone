@@ -1,4 +1,5 @@
 B src
+B src/crunched
 PKG omd
 PKG cow
 PKG config-file
