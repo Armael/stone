@@ -13,14 +13,14 @@ have:
         └── index.md
 
 * The `config.stone` file describes the configuration of your
-project. It defines it's name, the pages you want to have in the title
+project. It defines its name, the pages you want to have in the title
 bar, and other things.
 * The `data` directory contains the static content used to generate
   the pages:
   - `template.html`: the default template.
   - `org-template.html`: a template for org-mode pages exported by mlorg.
   - `style.css`: The stylesheet. The default one is made by
-    [Theotix](http://theotix.me) (Thanks!).
+    [Theotix](http://theoti.me) (Thanks!).
 * The `pages` directory is where you write the pages with your
   content. They are processed by the exporters, then inserted into a
   template.
@@ -56,7 +56,7 @@ handle, and an external command to convert pages to html. There are
 more details in the default `config.stone`.
 
 If, for a given file in the `pages` directory, no exporter is found,
-it is copyied as is.
+it is copied as is.
 
 ### Templates
 
