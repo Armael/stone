@@ -145,7 +145,7 @@ let gen_backpath depth =
   let parent_len = String.length Filename.parent_dir_name in
   let sep_len = String.length Filename.dir_sep in
   let back_len = parent_len + sep_len in
-  let path = String.create (depth * back_len) in
+  let path = String.make (depth * back_len) ' ' in
   for i = 0 to depth - 1 do
     String.blit Filename.parent_dir_name 0 path (back_len * i) parent_len;
     String.blit Filename.dir_sep 0 path (back_len * i + parent_len) sep_len;
