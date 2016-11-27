@@ -46,7 +46,7 @@ let build_folder folder =
      will be here) as long as the config file is present *)
   if not (Sys.file_exists (folder /^ config)) then (
     print_endline (folder ^
-                     " isn't a Stone repository or isn't properly initialized");
+                   " isn't a Stone repository or isn't properly initialized");
   ) else (
     let conf = Conf.parse_conf (folder /^ config) in
     (* We will generate all pages in /pages/, even if some are not
@@ -60,12 +60,12 @@ let build_folder folder =
       try Some (string_dump s)  with
         Sys_error _ -> None in
     let templates_str = map_some
-      (fun tpl -> option_map
-        (fun dump -> (tpl, dump))
-        (try_string_dump (folder /^ data /^ tpl)))
-      (default_template
-       :: org_template
-       :: (List.map snd conf.Conf.pages_templates)) in
+        (fun tpl -> option_map
+            (fun dump -> (tpl, dump))
+            (try_string_dump (folder /^ data /^ tpl)))
+        (default_template
+         :: org_template
+         :: (List.map snd conf.Conf.pages_templates)) in
 
     (* Found target name for each page we'll have to generate.
        The result is an association list. *)
@@ -153,11 +153,11 @@ and watch_rec_directory_ inotify base_handler folder:
   let stop_watching_subdir subdir =
     subdirs_handlers :=
       List.filter (fun (subdir', subdir_watch, _) ->
-          if subdir' = subdir then
-            (Inotify.rm_watch inotify subdir_watch;
-             false)
-          else true
-        ) !subdirs_handlers
+        if subdir' = subdir then
+          (Inotify.rm_watch inotify subdir_watch;
+           false)
+        else true
+      ) !subdirs_handlers
   in
 
   (* The inotify watch for this directory ([folder]). *)
@@ -167,20 +167,20 @@ and watch_rec_directory_ inotify base_handler folder:
   fun ((w, kinds, _, path_opt) as event) rel_path ->
     if watch_eq w folder_watch then (
       begin match path_opt with
-      | Some path ->
-        (* If an immediate subdirectory has been created or deleted, update our
-           watchs and the handler list. *)
-        if List.mem Inotify.Isdir kinds then (
-          if List.mem Inotify.Create kinds ||
-             List.mem Inotify.Moved_to kinds
-          then
-            watch_subdir path
-          else if List.mem Inotify.Delete kinds ||
-                  List.mem Inotify.Moved_from kinds
-          then
-            stop_watching_subdir path
-        )
-      | None -> ()
+        | Some path ->
+          (* If an immediate subdirectory has been created or deleted, update our
+             watchs and the handler list. *)
+          if List.mem Inotify.Isdir kinds then (
+            if List.mem Inotify.Create kinds ||
+               List.mem Inotify.Moved_to kinds
+            then
+              watch_subdir path
+            else if List.mem Inotify.Delete kinds ||
+                    List.mem Inotify.Moved_from kinds
+            then
+              stop_watching_subdir path
+          )
+        | None -> ()
       end;
       base_handler event rel_path
     ) else (
@@ -256,7 +256,7 @@ The action specified by the option is applied to all the folders\n
         print_endline (folder ^ " already exists, but is not a folder")
       else
         init_folder folder
-      ) !folders
+    ) !folders
   ) else if !clean then (
     List.iter (fun folder ->
       remove_directory (folder /^ site)
