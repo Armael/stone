@@ -83,7 +83,7 @@ let (/^) a b = Filename.concat a b
 let explore_directory dir =
   let root = dir in
 
-  let rec aux prefix = 
+  let rec aux prefix =
     let files = ref [] in
     let content = Sys.readdir (root /^ prefix) in
     Array.iter (fun it ->

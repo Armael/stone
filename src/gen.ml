@@ -56,20 +56,24 @@ let bar ?current bar_pages backpath targets =
        with Not_found -> f) in
     let link = backpath /^ link in
     if maybe_equal current f then (
-      <:xml<
-        <li class="current"><a href="$str:link$">$str:t$</a></li>
-      >> 
+      Xml.tag "li" ~attrs:["class", "current"] (
+        Xml.tag "a" ~attrs:["href", link] (
+          Xml.string t
+        )
+      )
     ) else (
-      <:xml<
-        <li><a href="$str:link$">$str:t$</a></li>
-      >>
+      Xml.tag "li" (
+        Xml.tag "a" ~attrs:["href", link] (
+          Xml.string t
+        )
+      )
     )
   in
-  <:xml<
-    <div id="bar">
-      <ul>$list:List.map item bar_pages$</ul>
-    </div>
-  >>
+  Xml.tag "div" ~attrs:["id", "bar"] (
+    Xml.tag "ul" (
+      Xml.list (List.map item bar_pages)
+    )
+  )
 
 let page folder template conf targets filename =
   let open Conf in
@@ -85,7 +89,7 @@ let page folder template conf targets filename =
     mkpath out_path dir_perm;
 
     let html_content = exporter in_file in
-    let bar_item = 
+    let bar_item =
       (try let it = (List.find (fun x -> x.file = filename)
                        conf.bar_pages) in
            Some it
@@ -97,7 +101,10 @@ let page folder template conf targets filename =
       | Some it -> it.title
       | None -> prefix in
     let css_path = backpath  /^ static /^ css in
-    let css = <:xml<<link href=$str:css_path$ type="text/css" rel="stylesheet"/> >> in
+    let css = Xml.tag "link"
+        ~attrs:[("href", css_path); ("type", "text/css"); ("rel", "stylesheet")]
+        Xml.empty
+    in
     let html_page = Template.fill template
       conf.site_title page_title
       css

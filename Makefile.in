@@ -1,6 +1,5 @@
 CC := ocamlfind ocamlc
-PACKAGES := omd,cow,cow.syntax,config-file,unix,str
-PP := camlp4o
+PACKAGES := omd,cow,config-file,unix,str
 CFLAGS := -linkpkg -I src/ -I src/packed/
 
 SRC := util.ml params.ml template.ml conf.ml gen.ml stone.ml
@@ -18,7 +17,7 @@ PACKED := $(patsubst %,src/packed/%,$(PACKED))
 all: stone
 
 stone: $(PACKED)
-	$(CC) -package $(PACKAGES) -syntax $(PP) $(CFLAGS) -o $@ $(PACKED) $(SRC) 
+	$(CC) -package $(PACKAGES) $(CFLAGS) -o $@ $(PACKED) $(SRC)
 
 doc: stone
 	./stone doc/
@@ -57,3 +56,4 @@ mproper: clean
 	rm -rf $(PACKER)
 	rm -rf $(PACKED)
 	rm -rf doc/site/*
+	rm -rf Makefile

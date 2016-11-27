@@ -32,11 +32,11 @@ let rec fill_in_xml (templates: (string * Xml.t) list) (xml: Xml.t) =
 
 let fill template site_title page_title css bar content =
   let templates = [
-    "PAGE_TITLE", <:xml<$str:page_title$>>;
-    "SITE_TITLE", <:xml<$str:site_title$>>;
-    "CSS"       , <:xml<$css$>>;
-    "BAR"       , <:xml<$bar$>>;
-    "CONTENT"   , <:xml<$content$>>;
+    "PAGE_TITLE", Xml.string page_title;
+    "SITE_TITLE", Xml.string site_title;
+    "CSS"       , css;
+    "BAR"       , bar;
+    "CONTENT"   , content;
   ] in
   try
     Html.of_string template |> fill_in_xml templates
