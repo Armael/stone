@@ -1,59 +1,33 @@
 CC := ocamlfind ocamlc
-PACKAGES := omd,cow,config-file,unix,str
-CFLAGS := -linkpkg -I src/ -I src/packed/
+PACKAGES := omd,cow,config-file,crunch,unix,str
+CFLAGS := -linkpkg -I src/ -I src/crunched/
 
 SRC := util.ml params.ml template.ml conf.ml gen.ml stone.ml
-PACKER_SRC := utils/pack_text.ml
-
 SRC := $(patsubst %,src/%,$(SRC))
-PACKER_SRC := $(patsubst %,src/%,$(PACKER_SRC))
 
-PACKER := $(patsubst %.ml,%,$(PACKER_SRC))
-
-PACKED_NAMES := config.stone example_index.md template.html org_template.html style.css
-PACKED := $(addsuffix _pak.ml, $(basename $(PACKED_NAMES)))
-PACKED := $(patsubst %,src/packed/%,$(PACKED))
+DATA_DIR := data
+CRUNCHED_DATA := $(patsubst %,src/crunched/%.ml,$(DATA_DIR))
 
 all: stone
 
-stone: $(PACKED)
-	$(CC) -package $(PACKAGES) $(CFLAGS) -o $@ $(PACKED) $(SRC)
+stone: $(CRUNCHED_DATA)
+	$(CC) -package $(PACKAGES) $(CFLAGS) -o $@ $(CRUNCHED_DATA) $(SRC)
 
 doc: stone
 	./stone doc/
 
-src/packed/config_pak.ml: packer
-	$(PACKER) data/config.stone src/packed/config_pak.ml
-
-src/packed/example_index_pak.ml: packer
-	$(PACKER) data/example_index.md src/packed/example_index_pak.ml
-
-src/packed/template_pak.ml: packer
-	$(PACKER) data/template.html src/packed/template_pak.ml
-
-src/packed/org_template_pak.ml: packer
-	$(PACKER) data/org_template.html src/packed/org_template_pak.ml
-
-src/packed/style_pak.ml: packer
-	$(PACKER) data/style.css src/packed/style_pak.ml
-
-packer:
-	$(CC) $(CFLAGS) -o $(PACKER) $(PACKER_SRC)
-	mkdir -p src/packed
-
-$(PACKED_SRC):
+$(CRUNCHED_DATA):
+	mkdir -p src/crunched/
+	ocaml-crunch -m plain $(DATA_DIR) -o $@
 
 clean:
 	rm -rf src/*.cmo
 	rm -rf src/*.cmi
-	rm -rf src/packed/*.cmo
-	rm -rf src/packed/*.cmi
-	rm -rf src/utils/*.cmo
-	rm -rf src/utils/*.cmi
+	rm -rf src/crunched/*.cmo
+	rm -rf src/crunched/*.cmi
 
 mproper: clean
 	rm -rf stone
-	rm -rf $(PACKER)
-	rm -rf $(PACKED)
+	rm -rf src/crunched
 	rm -rf doc/site/*
 	rm -rf Makefile

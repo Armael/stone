@@ -7,6 +7,11 @@ open Cow
 open Util
 open Params
 
+let get_data filename =
+  match Data.read filename with
+  | None -> die (Printf.sprintf "Data file not found : %s" filename)
+  | Some s -> s
+
 let init_folder folder =
   (* Check if the given folder is empty, if not, do nothing *)
   if Array.length (Sys.readdir folder) > 0 then (
@@ -21,18 +26,18 @@ let init_folder folder =
     Unix.mkdir (folder /^ site) dir_perm;
 
     (* Write the templates and the css *)
-    dump_string file_perm (folder /^ data /^ default_template) Template_pak.text;
-    dump_string file_perm (folder /^ data /^ org_template) Org_template_pak.text;
-    dump_string file_perm (folder /^ data /^ css) Style_pak.text;
+    dump_string file_perm (folder /^ data /^ default_template) (get_data "template.html");
+    dump_string file_perm (folder /^ data /^ org_template) (get_data "org_template.html");
+    dump_string file_perm (folder /^ data /^ css) (get_data "style.css");
 
     (* Write the default config file *)
-    dump_string file_perm (folder /^ config) Config_pak.text;
+    dump_string file_perm (folder /^ config) (get_data "config.stone");
 
     (* Write the example home page *)
-    dump_string file_perm (folder /^ pages /^ example_index) Example_index_pak.text
+    dump_string file_perm (folder /^ pages /^ example_index) (get_data "example_index.md");
   )
 
-let build_folder folder = 
+let build_folder folder =
   (* We assume that everything will be okay (the templates & css
      will be here) as long as the config file is present *)
   if not (Sys.file_exists (folder /^ config)) then (
@@ -102,10 +107,10 @@ Manage stone static websites located in the given FOLDERs.
 If no FOLDER is specified, the current directory is used.
 The action specified by the option is applied to all the folders\n
   no option  Build the static pages (in a directory initialized with -i)";
-  
+
   if !folders = [] then
     folders := ["."];
-  
+
   List.iter (fun folder ->
     if !init then (
       if not (Sys.file_exists folder) then
