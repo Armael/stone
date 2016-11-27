@@ -88,10 +88,15 @@ let explore_directory dir =
     let content = Sys.readdir (root /^ prefix) in
     Array.iter (fun it ->
       let it = prefix /^ it in
-      if Sys.is_directory (root /^ it) then
-        files := (aux it) @ !files
-      else
-        files := it :: !files
+      try
+        if Sys.is_directory (root /^ it) then
+          files := (aux it) @ !files
+        else
+          files := it :: !files
+      with Sys_error _ ->
+        (* Most likely, the file got removed between the call to [Sys.readdir]
+           and the call to [Sys.is_directory]. *)
+        ()
     ) content;
     !files in
   aux ""
@@ -106,6 +111,11 @@ let rec remove_directory dir =
       Unix.unlink f
   done;
   Unix.rmdir dir
+
+let subdirectories dir =
+  Sys.readdir dir
+  |> Array.to_list
+  |> List.filter (fun s -> Sys.is_directory (dir /^ s))
 
 (* Tries to create a directory. In case of failure, do nothing *)
 let try_mkdir name perm =

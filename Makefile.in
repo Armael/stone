@@ -1,5 +1,5 @@
 CC := ocamlfind ocamlc
-PACKAGES := omd,cow,config-file,crunch,unix,str
+PACKAGES := omd,cow,config-file,crunch,inotify,unix,str
 CFLAGS := -linkpkg -I src/ -I src/crunched/
 
 SRC := util.ml params.ml template.ml conf.ml gen.ml stone.ml
@@ -10,7 +10,7 @@ CRUNCHED_DATA := $(patsubst %,src/crunched/%.ml,$(DATA_DIR))
 
 all: stone
 
-stone: $(CRUNCHED_DATA)
+stone: $(SRC) $(CRUNCHED_DATA)
 	$(CC) -package $(PACKAGES) $(CFLAGS) -o $@ $(CRUNCHED_DATA) $(SRC)
 
 doc: stone

@@ -2,5 +2,6 @@ B src
 PKG omd
 PKG cow
 PKG config-file
+PKG inotify
 PKG unix
 PKG str
