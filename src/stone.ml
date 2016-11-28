@@ -98,131 +98,31 @@ let build_folder folder =
 (* Watcher mode, looking for changes in data, pages or config, using inotify,
    and rebuilding when it happens.
 *)
-type rel_path = string
-type handler = Inotify.event -> rel_path -> unit
-
-let modified_selectors = [
-  Inotify.S_Create;
-  Inotify.S_Delete;
-  Inotify.S_Modify;
-  Inotify.S_Move;
-]
-
-let watch_eq w1 w2 =
-  (Inotify.int_of_watch w1) = (Inotify.int_of_watch w2)
-
-(* Watches a directory, recursively.
-
-   Returns a handler that should be called on every inotify event; which will in
-   turn call [base_handler] on each event, with the additional [rel_path]
-   information, which contains the path of the sub-directory on which the event
-   occured.
-*)
-let rec watch_rec_directory
-    (inotify: Unix.file_descr)
-    (base_handler: handler)
-    (folder: string):
-  handler
-  =
-  snd (watch_rec_directory_ inotify base_handler folder)
-
-and watch_rec_directory_ inotify base_handler folder:
-  Inotify.watch * handler
-  =
-
-  (* The list of the currently watched immediate subdirectories *)
-  let subdirs_handlers : (string * Inotify.watch * handler) list ref =
-    ref []
-  in
-
-  (* Watch a new immediate directory, and add it to the list. *)
-  let watch_subdir subdir =
-    let (subdir_watch, subdir_handler) =
-      watch_rec_directory_
-        inotify
-        (fun e p -> base_handler e (subdir /^ p))
-        (folder /^ subdir)
-    in
-    subdirs_handlers :=
-      (subdir, subdir_watch, subdir_handler) ::
-      !subdirs_handlers
-  in
-  List.iter watch_subdir (subdirectories folder);
-
-  (* Stop watching an immediate subdirectory, and remove it from the list. *)
-  let stop_watching_subdir subdir =
-    subdirs_handlers :=
-      List.filter (fun (subdir', subdir_watch, _) ->
-        if subdir' = subdir then
-          (Inotify.rm_watch inotify subdir_watch;
-           false)
-        else true
-      ) !subdirs_handlers
-  in
-
-  (* The inotify watch for this directory ([folder]). *)
-  let folder_watch = Inotify.add_watch inotify folder modified_selectors in
-
-  folder_watch,
-  fun ((w, kinds, _, path_opt) as event) rel_path ->
-    if watch_eq w folder_watch then (
-      begin match path_opt with
-        | Some path ->
-          (* If an immediate subdirectory has been created or deleted, update our
-             watchs and the handler list. *)
-          if List.mem Inotify.Isdir kinds then (
-            if List.mem Inotify.Create kinds ||
-               List.mem Inotify.Moved_to kinds
-            then
-              watch_subdir path
-            else if List.mem Inotify.Delete kinds ||
-                    List.mem Inotify.Moved_from kinds
-            then
-              stop_watching_subdir path
-          )
-        | None -> ()
-      end;
-      base_handler event rel_path
-    ) else (
-      (* If the event is not for this directory, propagate it to the handlers of
-         the sub-directories. In theory, this could be optimized, but I'm not sure
-         it's worth the trouble. *)
-      List.iter (fun (_, _, handler) -> handler event rel_path)
-        !subdirs_handlers
-    )
-
-let watch_file inotify base_handler filename : handler =
-  let file_watch = Inotify.add_watch inotify filename modified_selectors in
-  fun ((w, _, _, _) as event) rel_path ->
-    if watch_eq file_watch w then base_handler event rel_path
-    else ()
-
-let watch_and_rebuild_stone_project inotify folder : handler =
-  let rebuild_handler _ _ =
+let watch_and_rebuild_stone_project inotify folder : Watch.handler =
+  let rebuild_handler _ =
     Printf.printf "Rebuilding stone project \"%s\".\n%!" folder;
     build_folder folder
   in
+  let rebuild_handler_rel _ = rebuild_handler in
 
   let data_handler =
-    watch_rec_directory inotify rebuild_handler (folder /^ data) in
+    Watch.watch_rec_directory inotify rebuild_handler_rel (folder /^ data) in
   let pages_handler =
-    watch_rec_directory inotify rebuild_handler (folder /^ pages) in
+    Watch.watch_rec_directory inotify rebuild_handler_rel (folder /^ pages) in
   let config_handler =
-    watch_file inotify rebuild_handler (folder /^ config) in
+    Watch.watch_file inotify rebuild_handler (folder /^ config) in
 
-  fun event rel_path ->
-    data_handler event rel_path;
-    pages_handler event rel_path;
-    config_handler event rel_path
+  fun event ->
+    data_handler event;
+    pages_handler event;
+    config_handler event
 
 let watch_stone_folders folders =
   let inotify = Inotify.create () in
   let handlers = List.map (watch_and_rebuild_stone_project inotify) folders in
   while true do
     let events = Inotify.read inotify in
-    List.iter (fun event ->
-      List.iter (fun handler -> handler event "") handlers
-    ) events
+    List.iter (fun event -> List.iter ((|>) event) handlers) events
   done
 
 let () =
@@ -234,9 +134,9 @@ let () =
   Arg.parse [
     "-i"    , Arg.Unit (fun () -> init := true), " Setup a new static website in FOLDER";
     "-c"    , Arg.Unit (fun () -> clean := true), " Clean FOLDER : remove the generated \
-pages (in site/)";
+                                                   pages (in site/)";
     "-w"    , Arg.Unit (fun () -> watch_mode := true), " Watch FOLDER for modifications \
-and automatically rebuild site/";
+                                                        and automatically rebuild site/";
   ] (fun dir -> folders := dir :: !folders)
     "Usage : stone [OPTIONS] [FOLDER]...
 Manage stone static websites located in the given FOLDERs.
