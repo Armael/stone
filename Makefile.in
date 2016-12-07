@@ -2,7 +2,7 @@ CC := ocamlfind ocamlc
 PACKAGES := omd,cow,config-file,crunch,inotify,unix,str
 CFLAGS := -linkpkg -I src/ -I src/crunched/
 
-SRC := util.ml params.ml template.ml conf.ml gen.ml watch.ml stone.ml
+SRC := util.ml params.ml template.ml conf.ml gen.ml watch.mli watch.ml stone.ml
 SRC := $(patsubst %,src/%,$(SRC))
 
 DATA_DIR := data
