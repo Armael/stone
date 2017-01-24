@@ -23,13 +23,11 @@ let custom_exporter command = fun file ->
   ignore (Unix.close_process_in cin);
   output
   |> Buffer.contents
-  |> Html.of_string
 
 let markdown_exporter = fun file ->
   string_dump file
   |> Omd.of_string
   |> Omd.to_html
-  |> Html.of_string
 
 let targets conf pages =
   let exports =
@@ -73,7 +71,7 @@ let bar ?current bar_pages backpath targets =
     Xml.tag "ul" (
       Xml.list (List.map item bar_pages)
     )
-  )
+  ) |> Xml.to_string
 
 let page folder template conf targets filename =
   let open Conf in
@@ -101,18 +99,18 @@ let page folder template conf targets filename =
       | Some it -> it.title
       | None -> prefix in
     let css_path = backpath  /^ static /^ css in
-    let css = Xml.tag "link"
+    let css =
+      Xml.tag "link"
         ~attrs:[("href", css_path); ("type", "text/css"); ("rel", "stylesheet")]
         Xml.empty
+      |> Xml.to_string
     in
     let html_page = Template.fill template
       conf.site_title page_title
       css
       (bar ?current conf.bar_pages backpath targets)
       html_content in
-    let out_str = (try Html.to_string html_page with
-      Parsing.Parse_error -> die ("Error : unable to generate page " ^ in_file)) in
-    dump_string conf.file_perm out_file out_str
+    dump_string conf.file_perm out_file html_page
 
   with Not_found ->
     let out_file = folder /^ site /^ filename in
