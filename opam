@@ -18,6 +18,6 @@ depends: [
   "cow" {>= "2.0.0"}
   "config-file"
   "crunch"
-  "inotify"
+  "inotify" {>= "2.3"}
   "omd"
   ]
