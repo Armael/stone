@@ -1,0 +1,5 @@
+Makefile
+*.cmi
+*.cmo
+stone
+src/crunched/*
