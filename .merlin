@@ -6,3 +6,4 @@ PKG config-file
 PKG inotify
 PKG unix
 PKG str
+FLG -safe-string

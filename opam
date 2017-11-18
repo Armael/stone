@@ -16,6 +16,7 @@ remove: [
 depends: [
   "ocamlfind" {build}
   "cow" {>= "2.0.0"}
+  "base-bytes"
   "config-file"
   "crunch"
   "inotify" {>= "2.3"}

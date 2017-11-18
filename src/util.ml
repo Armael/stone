@@ -18,10 +18,10 @@ let dump_string perm filename s =
 let string_dump filename =
   let chan = open_in filename in
   let len = in_channel_length chan in
-  let s = String.make (len+1) '\n' in
-  ignore (input chan s 0 len);
+  let b = Bytes.make (len+1) '\n' in
+  ignore (input chan b 0 len);
   close_in chan;
-  s
+  Bytes.to_string b
 
 let copy_file perm f1 f2 =
   let c1 = open_in f1 in
@@ -155,12 +155,12 @@ let gen_backpath depth =
   let parent_len = String.length Filename.parent_dir_name in
   let sep_len = String.length Filename.dir_sep in
   let back_len = parent_len + sep_len in
-  let path = String.make (depth * back_len) ' ' in
+  let path = Bytes.make (depth * back_len) ' ' in
   for i = 0 to depth - 1 do
-    String.blit Filename.parent_dir_name 0 path (back_len * i) parent_len;
-    String.blit Filename.dir_sep 0 path (back_len * i + parent_len) sep_len;
+    Bytes.blit_string Filename.parent_dir_name 0 path (back_len * i) parent_len;
+    Bytes.blit_string Filename.dir_sep 0 path (back_len * i + parent_len) sep_len;
   done;
-  path
+  Bytes.to_string path
 
 let rec map_some f = function
   | [] -> []
