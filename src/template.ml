@@ -3,7 +3,6 @@
    See the file LICENSE for copying permission.
 *)
 
-open Cow
 open Util
 
 let fill_in_string (templates: (string * string) list) (s: string) =

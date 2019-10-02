@@ -3,7 +3,6 @@
    See the file LICENSE for copying permission.
 *)
 
-open Cow
 open Util
 open Params
 

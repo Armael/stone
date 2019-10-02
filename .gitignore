@@ -1,5 +1,4 @@
-Makefile
-*.cmi
-*.cmo
-stone
-src/crunched/*
+_build/
+*.merlin
+*.install
+doc/site/
