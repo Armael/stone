@@ -1,24 +1,21 @@
-opam-version: "1.2"
+opam-version: "2.0"
 maintainer: "armael@isomorphis.me"
 author: "armael@isomorphis.me"
 homepage: "http://dev.isomorphis.me/stone"
 bug-reports: "http://github.com/Armael/stone/issues"
-dev-repo: "http://github.com/Armael/stone.git"
+dev-repo: "git+https://github.com/Armael/stone.git"
 build: [
-  ["./configure" "--bin-dir" bin]
-  [make]
-]
-install: [make "install"]
-remove: [
-  ["./configure" "--bin-dir" bin]
-  [make "uninstall"]
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs "@install"]
 ]
 depends: [
-  "ocamlfind" {build}
+  "dune" {>= "1.11"}
+  "crunch" {build}
   "cow" {>= "2.0.0"}
   "base-bytes"
   "config-file"
   "crunch"
   "inotify" {>= "2.3"}
   "omd"
-  ]
+]
+synopsis: "Stone is a static website generator"
