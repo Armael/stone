@@ -102,6 +102,8 @@ let explore_directory dir =
   aux ""
 
 let rec remove_directory dir =
+  if not (Sys.file_exists dir) then ()
+  else
   let files = Sys.readdir dir in
   for i = 0 to Array.length files - 1 do
     let f = dir /^ files.(i) in
