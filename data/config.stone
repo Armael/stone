@@ -1,10 +1,12 @@
 (* The title of your website *)
 Title = "My awesome site"
 
-(* Contents of the header bar.
+(* List of pages' title.
 
-   List of the pages to link in the header bar (next to the
-   title).
+   The title will be passed as $PAGE_TITLE$ to your template.
+
+   It'll also be used as the list of the pages to link in the
+   header bar (next to the title).
 
    Multiple entries should be separated by a semicolor. For
    example, to link the pages Home, Links, About, write:
