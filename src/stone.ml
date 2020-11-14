@@ -117,6 +117,8 @@ let watch_and_rebuild_stone_project inotify folder : Watch.handler =
     config_handler event
 
 let watch_stone_folders folders =
+  (* First rebuild to apply any prior changes *)
+  List.iter build_folder folders;
   let inotify = Inotify.create () in
   let handlers = List.map (watch_and_rebuild_stone_project inotify) folders in
   while true do
