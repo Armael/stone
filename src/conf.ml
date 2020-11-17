@@ -13,6 +13,7 @@ type page = {
 type config = {
   site_title : string;
   bar_pages : page list;
+  extra_static : string list;
   exports : (string * string) list;
   default_template : string;
   pages_templates : (string * string) list;
@@ -27,6 +28,8 @@ let parse_conf filename =
     (tuple2_wrappers string_wrappers string_wrappers)
     ~group
     ["Pages"] [] "List of the pages" in
+  let extra_static = new list_cp string_wrappers ~group
+    ["ExtraStatic"] [] "Additional files to copy from data/ to the static/ directory" in
   let exports = new list_cp
     (tuple2_wrappers string_wrappers string_wrappers)
     ~group
@@ -48,6 +51,7 @@ let parse_conf filename =
   group#read filename;
   { site_title = title#get;
     bar_pages = List.map (fun (f, t) -> { file = f; title = t }) pages#get;
+    extra_static = extra_static#get;
     exports = exports#get;
     default_template = default_template#get;
     pages_templates = pages_templates#get;

@@ -1,5 +1,3 @@
-all: stone
-
 stone:
 	dune build
 
@@ -14,3 +12,5 @@ clean:
 
 mrproper: clean
 	rm -rf doc/site/
+
+.PHONY: stone install doc clean mrproper

@@ -87,11 +87,18 @@ let build_folder folder =
       Gen.page folder template_str conf targets page)
       all_pages;
 
-    (* Copy the stylesheet into site/static/ *)
+    (* Copy the stylesheet and extra data files into site/static/ *)
     (try Unix.mkdir (folder /^ site /^ static) conf.Conf.dir_perm
      with Unix.Unix_error _ -> ());
     copy_file conf.Conf.file_perm (folder /^ data /^ css)
-      (folder /^ site /^ static /^ css)
+      (folder /^ site /^ static /^ css);
+    List.iter (fun extra_static_f ->
+      try
+        copy_file conf.Conf.file_perm (folder /^ data /^ extra_static_f)
+          (folder /^ site /^ static /^ extra_static_f)
+      with Sys_error _ ->
+        Printf.printf "Warning: extra data file '%s' not found\n" extra_static_f
+    ) conf.Conf.extra_static;
   )
 
 (* Watcher mode, looking for changes in data, pages or config, using inotify,

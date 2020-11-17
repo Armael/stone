@@ -20,6 +20,15 @@ Pages = [ ("index.md", "Home") ]
 (* Advanced configuration variables        ------ *)
 (* You may not need to change them for the moment *)
 
+(* Extra data files
+
+   To additionally copy font.ttf from data/ to site/static/, add:
+
+   ExtraStatic = [ "font.ttf" ]
+*)
+
+ExtraStatic = []
+
 (* Custom exporters for pages.
 
    An exporter is a program that takes a page filename as
