@@ -90,11 +90,11 @@ let build_folder folder =
     (* Copy the stylesheet and extra data files into site/static/ *)
     (try Unix.mkdir (folder /^ site /^ static) conf.Conf.dir_perm
      with Unix.Unix_error _ -> ());
-    copy_file conf.Conf.file_perm (folder /^ data /^ css)
+    copy_bin_file conf.Conf.file_perm (folder /^ data /^ css)
       (folder /^ site /^ static /^ css);
     List.iter (fun extra_static_f ->
       try
-        copy_file conf.Conf.file_perm (folder /^ data /^ extra_static_f)
+        copy_bin_file conf.Conf.file_perm (folder /^ data /^ extra_static_f)
           (folder /^ site /^ static /^ extra_static_f)
       with Sys_error _ ->
         Printf.printf "Warning: extra data file '%s' not found\n" extra_static_f

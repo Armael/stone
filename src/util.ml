@@ -23,17 +23,6 @@ let string_dump filename =
   close_in chan;
   Bytes.to_string b
 
-let copy_file perm f1 f2 =
-  let c1 = open_in f1 in
-  let c2 = open_out_gen open_wr_flags perm f2 in
-  (try
-    while true do
-      output_string c2 ((input_line c1) ^ "\n")
-    done
-   with End_of_file -> ());
-  close_in c1;
-  close_out c2
-
 let copy_bin_file perm f1 f2 =
   let c1 = open_in_bin f1 in
   let c2 = open_out_gen open_wr_bin_flags perm f2 in
