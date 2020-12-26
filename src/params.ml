@@ -25,5 +25,5 @@ and example_index = "index.md"
 and config = "config.stone"
 and initialized_flag = ".stone.initialized"
 
-let dir_perm = 0o751
+let dir_perm = 0o755
 and file_perm = 0o644
