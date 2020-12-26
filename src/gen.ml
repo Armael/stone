@@ -83,7 +83,7 @@ let page folder template conf targets filename =
     let (out_file, exporter) = List.assoc filename targets in
     let out_file = folder /^ site /^ out_file in
     let out_path = Filename.dirname out_file in
-    mkpath out_path dir_perm;
+    mkpath out_path conf.dir_perm;
 
     let html_content = exporter in_file in
     let bar_item =
@@ -115,5 +115,5 @@ let page folder template conf targets filename =
   with Not_found ->
     let out_file = folder /^ site /^ filename in
     let out_path = Filename.dirname out_file in
-    mkpath out_path dir_perm;
+    mkpath out_path conf.dir_perm;
     copy_bin_file conf.file_perm in_file out_file
