@@ -75,7 +75,6 @@ let bar ?current bar_pages backpath targets =
 
 let page folder template conf targets filename =
   let open Conf in
-  let prefix = filename |> Filename.basename |> Filename.chop_extension in
   let filepath = filename |> Filename.dirname in
   let backpath = gen_backpath (depth filepath) in
 
@@ -97,7 +96,8 @@ let page folder template conf targets filename =
       | None -> None in
     let page_title = match bar_item with
       | Some it -> it.title
-      | None -> prefix in
+      | None -> Filename.remove_extension (Filename.basename filename)
+    in
     let css_path = backpath  /^ static /^ css in
     let css =
       Xml.tag "link"
