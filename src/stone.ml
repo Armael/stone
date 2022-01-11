@@ -81,7 +81,7 @@ let build_folder folder =
           ) conf.Conf.pages_templates
           |> snd
         with
-          Not_found -> default_template in
+          Not_found -> conf.default_template in
       let template_str = List.assoc template_filename templates_str in
 
       Gen.page folder template_str conf targets page)
