@@ -21,6 +21,9 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 
+/* Google fonts */
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400&family=Roboto:wght@400&family=Roboto+Condensed:wght@400&display=swap');
+
 body{
 	margin: 0 auto;
 	color: #222;
@@ -135,30 +138,3 @@ p{
 h2 a, h3 a{
 	border: none;
 }
-
-
-
-/* Google fonts */
-@font-face {
-  font-family: 'Karla';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Karla'), local('Karla-Regular'), url(http://themes.googleusercontent.com/static/fonts/karla/v2/azR40LUJrT4HaWK28zHmVA.woff) format('woff');
-}
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Roboto Regular'), local('Roboto-Regular'), url(http://themes.googleusercontent.com/static/fonts/roboto/v7/2UX7WLTfW3W8TclTUvlFyQ.woff) format('woff');
-}
-@font-face {
-  font-family: 'Roboto Condensed';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Roboto Condensed Regular'), local('RobotoCondensed-Regular'), url(http://themes.googleusercontent.com/static/fonts/robotocondensed/v7/Zd2E9abXLFGSr9G3YK2MsFzqCfRpIA3W6ypxnPISCPA.woff) format('woff');
-}
-
-
-font-family: 'Roboto Condensed', sans-serif;
-font-family: 'Roboto', sans-serif;
-font-family: 'Karla', sans-serif;
