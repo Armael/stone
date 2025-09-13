@@ -33,7 +33,7 @@ let init_folder folder =
   |> List.filter (Astring.String.is_prefix ~affix:"static/")
   |> List.iter (fun f ->
     let target = folder /^ "pages" /^ f in
-    mkpath target;
+    mkpath_for target;
     write_file ~path:target (get_data f)
   );
 
@@ -62,8 +62,9 @@ let build_folder folder =
      The result is an association list (template filename -> Template.t) *)
   let templates =
     explore_directory (folder /^ "templates")
-    |> List.map (fun filename ->
-      (filename, Template.precompute Gen.template_keys (read_file filename))
+    |> List.map (fun file ->
+      let file_path = folder /^ "templates" /^ file in
+      (file, Template.precompute Gen.template_keys (read_file file_path))
     )
   in
 
@@ -87,16 +88,18 @@ let build_folder folder =
     in
     if List.is_empty matching_rules then (
       (* Copy as-is is there is no matching rule *)
-      let target = folder /^ "site" /^ file in
-      mkpath target;
-      copy_bin_file file target
+      let source_path = folder /^ "pages" /^ file in
+      let target_path = folder /^ "site" /^ file in
+      mkpath_for target_path;
+      copy_bin_file source_path target_path
     ) else (
       (* Apply the rules in order *)
       List.iter (fun (rule, target) ->
-        mkpath target;
-        let output = Rule.run rule file in
+        let target_path = folder /^ "site" /^ target in
+        mkpath_for target_path;
+        let output = Rule.run rule (folder /^ "pages" /^ file) in
         match rule.template with
-        | None -> write_file ~path:target output
+        | None -> write_file ~path:target_path output
         | Some template ->
           Gen.page folder (List.assoc template templates) conf file target output
       ) matching_rules;

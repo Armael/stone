@@ -85,5 +85,5 @@ let page
   in
 
   let target_path = folder /^ "site" /^ target in
-  mkpath target_path;
+  mkpath_for target_path;
   write_file ~path:target_path html_page

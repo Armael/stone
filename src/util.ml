@@ -101,13 +101,17 @@ let try_mkdir name =
   try mkdir name with
     Unix.Unix_error _ -> ()
 
-(* Creates all the folders needed to write in path.
+(* Creates all the folders needed to write in the directory [path].
    Similar to a 'mkdir -p'. *)
 let rec mkpath path =
   if not (Sys.file_exists path) then (
     mkpath (Filename.dirname path);
     try_mkdir path
   )
+
+(* Creates the required directories to write to the file [file_path] *)
+let mkpath_for file_path =
+  mkpath (Filename.dirname file_path)
 
 (* Count the number of folders in the given path.
 

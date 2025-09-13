@@ -1,4 +1,4 @@
-(* Copyright (c) 2013 Armaël Guéneau
+(* Copyright (c) 2013-2025 Armaël Guéneau
 
    See the file LICENSE for copying permission.
 *)
