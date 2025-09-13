@@ -6,4 +6,4 @@
 (executable
   (name stone)
   (public_name stone)
-  (libraries cow config-file crunch inotify omd str))
+  (libraries cow crunch inotify omd str bos otoml astring))
