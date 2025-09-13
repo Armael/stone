@@ -7,7 +7,7 @@ open Util
 
 let get_data filename =
   match Data.read filename with
-  | None -> die (Printf.sprintf "Data file not found: %s" filename)
+  | None -> println "Data file not found: %s" filename; exit 1
   | Some s -> s
 
 (* Initializes a new stone project, with default files.

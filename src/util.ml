@@ -1,14 +1,10 @@
-(* Copyright (c) 2013 Armaël Guéneau
+(* Copyright (c) 2013-2025 Armaël Guéneau
 
    See the file LICENSE for copying permission.
 *)
 
 let file_perm = 0o644
 let dir_perm = 0o755
-
-let die msg =
-  print_endline msg;
-  exit 1
 
 let open_wr_bin_flags = [Open_creat; Open_trunc; Open_binary; Open_wronly]
 
@@ -29,13 +25,6 @@ let copy_bin_file f1 f2 =
    with End_of_file -> ());
   close_in c1;
   close_out c2
-
-let list_of_array a =
-  let l = ref [] in
-  for i = 0 to Array.length a - 1 do
-    l := a.(i) :: !l
-  done;
-  !l
 
 let reduce f = function
   | [] -> raise (Invalid_argument "Empty list")
@@ -145,20 +134,6 @@ let depth path =
 *)
 let gen_backpath depth =
   String.concat "" @@ List.init depth (fun _ -> "../")
-
-let rec map_some f = function
-  | [] -> []
-  | x::xs -> match f x with
-    | None -> map_some f xs
-    | Some y -> y::(map_some f xs)
-
-let option_map f = function
-  | None -> None
-  | Some x -> Some (f x)
-
-let (|>) x f = f x
-let (@@) f x = f x
-let (%) f g = fun x -> f (g x)
 
 let println =
   Printf.kfprintf (fun cout -> Printf.fprintf cout "\n%!") stdout
