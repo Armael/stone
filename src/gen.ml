@@ -7,28 +7,6 @@ open Cow
 open Util
 open Params
 
-let custom_exporter command = fun file ->
-  let command = Str.global_replace
-    (Str.regexp "%{file}%")
-    (Filename.quote file)
-    command in
-  let cin = Unix.open_process_in command in
-  let output = Buffer.create 800 in
-  (try
-    while true do
-      Buffer.add_string output (input_line cin);
-      Buffer.add_char output '\n'
-    done
-  with End_of_file -> ());
-  ignore (Unix.close_process_in cin);
-  output
-  |> Buffer.contents
-
-let markdown_exporter = fun file ->
-  string_dump file
-  |> Omd.of_string
-  |> Omd.to_html
-
 let targets conf pages =
   let exports =
     (List.map (fun (suf, exp) -> (suf, custom_exporter exp)) conf.Conf.exports)
