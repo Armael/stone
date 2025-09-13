@@ -13,25 +13,10 @@ type page = {
   title : string;
 }
 
-type rule_kind =
-  | External_command of {
-    (* dom(cmd) = 'source' *)
-    cmd: Pat.t;
-  }
-  | Builtin_markdown
-
-type rule = {
-  kind: rule_kind;
-  (* dom(target) included in dom(source) *)
-  source: Pat.t;
-  target: Pat.t;
-  template: string option;
-}
-
-type config = {
+type t = {
   title: string;
   header: page list;
-  rules: rule list;
+  rules: Rule.t list;
 }
 
 let parse_conf filename =
@@ -52,7 +37,7 @@ let parse_conf filename =
     pat
   in
 
-  let get_rule (toml: Otoml.t): rule =
+  let get_rule (toml: Otoml.t): Rule.t =
     let source = Otoml.find toml get_pat ["source"] in
     let target = Otoml.find toml (
       get_pat ~check_domain:(fun dom ->
@@ -61,7 +46,7 @@ let parse_conf filename =
       )
     ) ["target"] in
     let template = Otoml.find_opt toml Otoml.get_string ["template"] in
-    let kind =
+    let runner =
       match Otoml.find toml Otoml.get_string ["kind"] with
       | "external_command" ->
         let cmd = Otoml.find toml (
@@ -70,13 +55,13 @@ let parse_conf filename =
             else Error (fmt "'command' can only use the $(source) variable")
           )
         ) ["command"] in
-        External_command { cmd }
+        Rule.External_command { cmd }
       | "builtin_markdown" ->
-        Builtin_markdown
+        Rule.Builtin_markdown
       | kind ->
         raise (Otoml.Type_error (fmt "Unknown rule kind: %s" kind))
     in
-    { source; target; template; kind }
+    { source; target; template; runner }
   in
 
   let* toml =

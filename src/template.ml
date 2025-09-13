@@ -5,11 +5,9 @@
 
 open Util
 
-let fill_in_string (templates: (string * string) list) (s: string) =
-  let keys = List.map fst templates in
-  let templates = List.map (fun (s, x) ->
-    ("$" ^ s ^ "$", x)) templates
-  in
+type t = Str.split_result list
+
+let precompute (keys: string list) (s: string) =
   let regexp =
     keys
     |> interleave ~first:"\\$" "\\$\\|\\$" ~last:"\\$"
@@ -18,16 +16,16 @@ let fill_in_string (templates: (string * string) list) (s: string) =
   in
   Str.full_split regexp s
   |> List.map (function
-    | Str.Text x -> x
-    | Str.Delim x -> List.assoc x templates)
-  |> String.concat ""
+    | Str.Text x -> Str.Text x
+    | Str.Delim x ->
+      (* remove the $ delimiters *)
+      Str.Delim (Astring.String.with_range ~first:1 ~len:(String.length x - 2) x)
+  )
 
-let fill template site_title page_title css bar content =
-  let templates = [
-    "PAGE_TITLE", page_title;
-    "SITE_TITLE", site_title;
-    "CSS"       , css;
-    "BAR"       , bar;
-    "CONTENT"   , content;
-  ] in
-  fill_in_string templates template
+let fill (template: t) (data: (string * string) list) =
+  let b = Buffer.create 80 in
+  List.iter (function
+    | Str.Text x -> Buffer.add_string b x
+    | Str.Delim x -> Buffer.add_string b (List.assoc x data)
+  ) template;
+  Buffer.contents b

@@ -1,97 +1,89 @@
-(* Copyright (c) 2013 Armaël Guéneau
+(* Copyright (c) 2013-2025 Armaël Guéneau
 
    See the file LICENSE for copying permission.
 *)
 
-open Cow
 open Util
-open Params
 
-let targets conf pages =
-  let exports =
-    (List.map (fun (suf, exp) -> (suf, custom_exporter exp)) conf.Conf.exports)
-    @ [ (".md", markdown_exporter);
-        (".markdown", markdown_exporter) ] in
-  List.fold_left (fun targets page ->
-    try
-      let (suf, exp) = List.find ((Filename.check_suffix page) % fst)
-        exports in
-      (page, ((Filename.chop_suffix page suf) ^ ".html", exp))::targets
-    with Not_found -> targets
-  ) [] pages
+let template_data ~title ~page_title ~bar ~content ~path_to_root () = [
+    "SITE_TITLE", title;
+    "PAGE_TITLE", page_title;
+    "BAR", bar;
+    "CONTENT", content;
+    "PATH_TO_ROOT", path_to_root;
+  ]
 
-let bar ?current bar_pages backpath targets =
+let template_keys =
+  (* hackish *)
+  List.map fst (
+    template_data ~title:"" ~page_title:"" ~bar:"" ~content:"" ~path_to_root:"" ()
+  )
+
+let bar ?current ~path_to_root items =
   let open Conf in
-  let maybe_equal opt x = match opt with
-    | None -> false
-    | Some y -> x = y in
-  let item {file = f; title = t} =
-    let link =
-      (try
-        fst (List.assoc f targets)
-       with Not_found -> f) in
-    let link = backpath /^ link in
-    if maybe_equal current f then (
+  let open Cow in
+  let mk_item {file; title} =
+    let link = path_to_root ^ file in
+    if current = Some file then (
       Xml.tag "li" ~attrs:["class", "current"] (
         Xml.tag "a" ~attrs:["href", link] (
-          Xml.string t
+          Xml.string title
         )
       )
     ) else (
       Xml.tag "li" (
         Xml.tag "a" ~attrs:["href", link] (
-          Xml.string t
+          Xml.string title
         )
       )
     )
   in
   Xml.tag "div" ~attrs:["id", "bar"] (
     Xml.tag "ul" (
-      Xml.list (List.map item bar_pages)
+      Xml.list (List.map mk_item items)
     )
   ) |> Xml.to_string
 
-let page folder template conf targets filename =
-  let open Conf in
-  let filepath = filename |> Filename.dirname in
-  let backpath = gen_backpath (depth filepath) in
+let page
+    (folder: string)
+    (template: Template.t)
+    (conf: Conf.t)
+    (source: string)
+    (target: string)
+    (content: string)
+  =
+  let header_item =
+    List.find_opt (fun (p: Conf.page) -> p.file = target) conf.header in
 
-  let in_file = folder /^ pages /^ filename in
-  try
-    let (out_file, exporter) = List.assoc filename targets in
-    let out_file = folder /^ site /^ out_file in
-    let out_path = Filename.dirname out_file in
-    mkpath out_path conf.dir_perm;
+  let page_title =
+    match header_item with
+    | Some p -> p.title
+    | None ->
+      (* XXX this is a best-effort hack, but is not very satisfactory.
+         If a page is not linked in the header, then there is no way to
+         define its title except through the filename.
+         Should there instead be some frontmatter mechanism?.. *)
+      Filename.remove_extension (Filename.basename target)
+  in
 
-    let html_content = exporter in_file in
-    let bar_item =
-      (try let it = (List.find (fun x -> x.file = filename)
-                       conf.bar_pages) in
-           Some it
-       with Not_found -> None) in
-    let current = match bar_item with
-      | Some it -> Some it.file
-      | None -> None in
-    let page_title = match bar_item with
-      | Some it -> it.title
-      | None -> Filename.remove_extension (Filename.basename filename)
-    in
-    let css_path = backpath  /^ static /^ css in
-    let css =
-      Xml.tag "link"
-        ~attrs:[("href", css_path); ("type", "text/css"); ("rel", "stylesheet")]
-        Xml.empty
-      |> Xml.to_string
-    in
-    let html_page = Template.fill template
-      conf.site_title page_title
-      css
-      (bar ?current conf.bar_pages backpath targets)
-      html_content in
-    dump_string conf.file_perm out_file html_page
+  let path_to_root = gen_backpath (depth source - 1) in
 
-  with Not_found ->
-    let out_file = folder /^ site /^ filename in
-    let out_path = Filename.dirname out_file in
-    mkpath out_path conf.dir_perm;
-    copy_bin_file conf.file_perm in_file out_file
+  let bar =
+    bar ?current:(Option.map (fun (p: Conf.page) -> p.file) header_item)
+      ~path_to_root conf.header
+  in
+
+  let html_page = Template.fill template (
+    template_data
+      ~title:conf.title
+      ~page_title
+      ~bar
+      ~content
+      ~path_to_root
+      ()
+  )
+  in
+
+  let target_path = folder /^ "site" /^ target in
+  mkpath target_path;
+  write_file ~path:target_path html_page
