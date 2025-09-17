@@ -16,15 +16,17 @@ let write_file ~path contents =
   Out_channel.output_string cout contents
 
 let copy_bin_file f1 f2 =
-  let c1 = open_in_bin f1 in
-  let c2 = open_out_gen open_wr_bin_flags file_perm f2 in
-  (try
-     while true do
-       output_byte c2 (input_byte c1)
-     done
-   with End_of_file -> ());
-  close_in c1;
-  close_out c2
+  let buf = Bytes.create 4096 in
+  let rec copy cin cout =
+    let read = In_channel.input cin buf 0 (Bytes.length buf) in
+    if read > 0 then (
+      Out_channel.output_substring cout (Bytes.unsafe_to_string buf) 0 read;
+      copy cin cout
+    )
+  in
+  In_channel.with_open_bin f1 @@ fun cin ->
+  Out_channel.with_open_gen open_wr_bin_flags file_perm f2 @@ fun cout ->
+  copy cin cout
 
 let reduce f = function
   | [] -> raise (Invalid_argument "Empty list")
