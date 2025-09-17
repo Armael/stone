@@ -43,8 +43,13 @@ let external_command (cmd: Pat.t) (file: string): string =
   |> Buffer.contents
 
 let markdown (file: string): string =
-  (* Use strict=false to get access to cmarkit extensions (why not?) *)
-  let doc = Cmarkit.Doc.of_string ~strict:false (Util.read_file file) in
+  let doc = Cmarkit.Doc.of_string
+      (* generate ids for headings (this was also the behavior of our previous markdown engine) *)
+      ~heading_auto_ids:true
+      (* get access to cmarkit extensions (why not?) *)
+      ~strict:false
+      (Util.read_file file)
+  in
   (* Use safe=false to allow including raw html. This is often convenient
      and we trust ourselves to not shoot ourselves in the foot. *)
   Cmarkit_html.of_doc ~safe:false doc

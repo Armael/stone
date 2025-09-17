@@ -15,54 +15,13 @@ title = "My website"
 # "Links" = "links.html"
 # "About" = "about.html"
 
-# A default preprocessor rule for markdown content.
-# Converts .md files to .html files using a builtin markdown engine,
-# and inserts the result in the provided template.
+# A rule for translating markdown .md files into html, inserting the result in
+# the provided template (in templates/).
+#
+# See the documentation for more details on how this rule works and how to
+# define other custom rules: https://dev.isomorphis.me/stone/specs.html#rules
 [[rules]]
-# Uses the builtin markdown engine, see "custom rules" for other kinds.
 kind = "builtin_markdown"
-# A pattern that will be matched against source files. Only files
-# that match this pattern will be processed by the rule.
 source = "$(base).md"
-# The pattern for the output filename. Must only use variables that were
-# first matched by the source pattern.
 target = "$(base).html"
-# Path to a file in the template/ directory to use as template.
-# The preprocessed contents will be inserted as $CONTENT$ in the template.
-# Optional. If absent, the preprocessed contents will be output as-is.
 template = "template.html"
-
-# Custom rules.
-#
-# It is possible to specify custom preprocessing rules to handle
-# other kind of contents.
-# If several rules match for a given input file, they are all applied
-# in definition order.
-# If no rule matches, the file is copied as is.
-#
-# The main way to define a custom rule is to use kind = "external_command".
-# Then, one can specify a 'command' which will be run in the shell.
-# The command can use the $(source) variable to refer to the input file,
-# and must write its output on the standard output. (It must not write
-# on the filesystem (except in /tmp)).
-#
-# Examples:
-#
-# Process .adoc files using the asciidoc command to turn them into html,
-# then insert them in a custom template.
-#
-# [[rules]]
-# kind = "external_command"
-# source = "$(base).adoc"
-# target = "$(base).html"
-# template = "asciidoc-template.html"
-# command = "asciidoc -b html -s -o - $(source)"
-#
-# Include .embed.html files in the default template as-is.
-#
-# [[rules]]
-# kind = "external_command"
-# source = "$(base).embed.html"
-# target = "$(base).html"
-# template = "template.html"
-# command = "cat $(source)"

@@ -1,0 +1,12 @@
+title = "Stone - the static website generator that rocks!"
+
+[header]
+"Overview" = "index.html"
+"Specs" = "specs.html"
+"Sources" = "sources.html"
+
+[[rules]]
+source = "$(base).md"
+target = "$(base).html"
+template = "template.html"
+kind = "builtin_markdown"
