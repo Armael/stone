@@ -15,7 +15,8 @@ type page = {
 
 type t = {
   title: string;
-  header: page list;
+  header: string list;
+  page_title: page list;
   rules: Rule.t list;
 }
 
@@ -71,8 +72,9 @@ let parse_conf filename =
     )
   in
   let* title = Otoml.find_result toml Otoml.get_string ["title"] in
-  let* header = Otoml.find_result toml (Otoml.get_table_values Otoml.get_string) ["header"] in
+  let* header = Otoml.find_result toml Otoml.(get_array get_string) ["header"] in
+  let* page_title = Otoml.find_result toml (Otoml.get_table_values Otoml.get_string) ["page_title"] in
   let* rules = Otoml.find_result toml (Otoml.get_array get_rule) ["rules"] in
 
-  let header = List.map (fun (title, file) -> { title; file }) header in
-  Ok { title; header; rules }
+  let page_title = List.map (fun (file, title) -> { title; file }) page_title in
+  Ok { title; header; page_title; rules }

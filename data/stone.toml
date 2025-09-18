@@ -1,19 +1,18 @@
 # The title of your website
 title = "My website"
 
-# Pages to link to in the header bar.
+# List of pages to link in the header bar.
 #
-# This is a list of string key-value pairs.
-# The key is the title of the page, the value is the path to the page
-# (in the target directory after preprocessing rules have run).
+# This is a list of paths after processing, as they appear in site/.
+header = ["index.html"]
+
+# A table specifying the title of pages.
 #
-# This data is used to generate the $BAR$ in the template file.
-# The page title is also passed as $PAGE_TITLE$ to the template.
-[header]
-"Home" = "index.html"
-# then, for instance...
-# "Links" = "links.html"
-# "About" = "about.html"
+# By default, the title of a page is its filename minus the extension.
+# This table allows overriding the default and specifying the title
+# separately. This is typically useful for index.html pages.
+[page_title]
+"index.html" = "Home"
 
 # A rule for translating markdown .md files into html, inserting the result in
 # the provided template (in templates/).

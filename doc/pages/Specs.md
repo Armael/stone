@@ -33,6 +33,36 @@ directory :
 The `site` directory contains the generated content: what you want to
 send online to be served by your web server.
 
+### Header bar
+
+Stone allows you to specify a list of pages that should appear in a website
+"header bar". This is done using the `header` setting, for instance:
+
+```
+header = ["index.html", "about.html"]
+```
+
+The elements of `header` should be file paths relative to `site/`.
+
+This results in stone generating a HTML snippet for the header, which is then
+inserted in the [template `BAR` variable](#templates).
+
+### Page titles
+
+Stone assigns a title to each page, inserted in the [template `PAGE_TITLE`
+variable](#templates). 
+
+By default, a page's title is the name of the file (in `site/`) after removing
+the extension. But this can also be overrided in the configuration file in the
+`page_title` table:
+
+```
+[page_title]
+"index.html" = "My homepage"
+```
+
+The `[page_title]` table maps file paths in `site/` to their page title.
+
 ### Rules
 
 Files in `pages/` are processed according to the list of rules specified in the
@@ -130,20 +160,15 @@ command = "cat $(source)"
 ### Templates
 
 Templates are arbitrary text files. Templates can contain *variables* that will
-be replaced during the pages generation.
+be replaced during the pages generation:
 
-The *variables* are:
 * `SITE_TITLE`: replaced by the website title specified with the `title`
   parameter in `stone.toml`;
-* `PAGE_TITLE`: if the current page is listed as a value in the `[header]` table
-  of `stone.toml`, then uses the corresponding key. Otherwise, is replaced by
-  the page's filename (without its extension);
-* `BAR`: replaced by the list of the pages listed in `[header]` in `stone.toml`.
-  Each item is a link to the page named by its title.
+* `PAGE_TITLE`: will be replaced by the [page's title](#page-titles).
+* `BAR`: replaced by a HTML snippet linking to the [header pages](#header-bar).
 * `PATH_TO_ROOT`: a relative path from the current page to the root of the
   website. Useful to refer to other files. For instance, to refer to
   `static/style.css`, use `$PATH_TO_ROOT$static/style.css`.
-* `PAGE_TITLE`: will be replaced by the title's page, if specified in
 * `CONTENT`: the content of the page itself, generated after applying the
   processing [rules](#rules).
 

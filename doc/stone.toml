@@ -1,9 +1,9 @@
 title = "Stone - the static website generator that rocks!"
 
-[header]
-"Overview" = "index.html"
-"Specs" = "specs.html"
-"Sources" = "sources.html"
+header = ["index.html", "Specs.html", "Sources.html"]
+
+[page_title]
+"index.html" = "Overview"
 
 [[rules]]
 source = "$(base).md"

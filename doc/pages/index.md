@@ -63,5 +63,5 @@ stone -w my-portfolio
 
 - For a more complete example, this documentation is written thanks to
   *Stone*. You can look at the [sources](https://github.com/Armael/stone).
-- Read the [specifications](specs.html) documenting the structure of the
+- Read the [specifications](Specs.html) documenting the structure of the
   project, content processing rules and templates.
