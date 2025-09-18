@@ -1,3 +1,3 @@
 ## My home page
 
-It works !
+It works!

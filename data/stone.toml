@@ -1,0 +1,26 @@
+# The title of your website
+title = "My website"
+
+# List of pages to link in the header bar.
+#
+# This is a list of paths after processing, as they appear in site/.
+header = ["index.html"]
+
+# A table specifying the title of pages.
+#
+# By default, the title of a page is its filename minus the extension.
+# This table allows overriding the default and specifying the title
+# separately. This is typically useful for index.html pages.
+[page_title]
+"index.html" = "Home"
+
+# A rule for translating markdown .md files into html, inserting the result in
+# the provided template (in templates/).
+#
+# See the documentation for more details on how this rule works and how to
+# define other custom rules: https://dev.isomorphis.me/stone/specs.html#rules
+[[rules]]
+kind = "builtin_markdown"
+source = "$(base).md"
+target = "$(base).html"
+template = "template.html"

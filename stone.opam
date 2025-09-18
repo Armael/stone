@@ -13,9 +13,10 @@ depends: [
   "crunch" {build}
   "cow" {>= "2.0.0"}
   "base-bytes"
-  "config-file"
-  "crunch"
   "inotify" {>= "2.3"}
-  "omd"
+  "cmarkit" {>= "0.3.0"}
+  "bos" {>= "0.2.0"}
+  "astring" {>= "0.8"}
+  "otoml" {>= "1.0"}
 ]
 synopsis: "Stone is a static website generator"

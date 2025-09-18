@@ -9,7 +9,7 @@ syntax, and generates the corresponding html pages.
 
 However, Stone isn't generalistic: his goal is to provide a very easy
 way to generate simple websites like a portfolio, or the pages of
-documentation for a small project. That is quite limitated, but Stone
+documentation for a small project. That is quite limited, but Stone
 tries to be good at what it aims.
 
 #### Installation

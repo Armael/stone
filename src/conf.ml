@@ -1,60 +1,80 @@
-(* Copyright (c) 2013 Armaël Guéneau
+(* Copyright (c) 2013-2025 Armaël Guéneau
 
    See the file LICENSE for copying permission.
 *)
 
-open Config_file
+module Pat = Bos.Pat
+module AS = Astring.String
+let (let*) = Result.bind
+let fmt = Printf.sprintf
 
 type page = {
   file : string;
-  title : string
+  title : string;
 }
 
-type config = {
-  site_title : string;
-  bar_pages : page list;
-  extra_static : string list;
-  exports : (string * string) list;
-  default_template : string;
-  pages_templates : (string * string) list;
-  dir_perm : int;
-  file_perm : int
+type t = {
+  title: string;
+  header: string list;
+  page_title: page list;
+  rules: Rule.t list;
 }
 
 let parse_conf filename =
-  let group = new group in
-  let title = new string_cp ~group ["Title"] "" "Title of the website" in
-  let pages = new list_cp
-    (tuple2_wrappers string_wrappers string_wrappers)
-    ~group
-    ["Pages"] [] "List of the pages" in
-  let extra_static = new list_cp string_wrappers ~group
-    ["ExtraStatic"] [] "Additional files to copy from data/ to the static/ directory" in
-  let exports = new list_cp
-    (tuple2_wrappers string_wrappers string_wrappers)
-    ~group
-    ["Exports"] [] "Custom exporters (to html) for source files" in
-  let default_template = new string_cp
-    ~group
-    ["DefaultTemplate"]
-    "template.html"
-    "The default html template to use" in
-  let pages_templates = new list_cp
-    (tuple2_wrappers string_wrappers string_wrappers)
-    ~group
-    ["PagesTemplates"] [] "List of couples (page, template to use)" in
-  let dir_perm = new int_cp ~group ["DirPerm"] Params.dir_perm
-    "Permission for the created directories" in
-  let file_perm = new int_cp ~group ["FilePerm"] Params.file_perm
-    "Permission for the created files" in
+  let get_pat
+      ?(check_domain: AS.Set.t -> (unit, string) Result.t = fun _ -> Ok ())
+      (toml: Otoml.t)
+    : Pat.t
+    =
+    let str = Otoml.get_string toml in
+    let pat = match Pat.of_string str with
+      | Ok p -> p
+      | Error (`Msg msg) -> raise (Otoml.Type_error (fmt "Failed to parse pattern '%s': %s" str msg))
+    in
+    begin match check_domain (Pat.dom pat) with
+      | Ok () -> ()
+      | Error msg -> raise (Otoml.Type_error (fmt "Invalid pattern '%s': %s" str msg))
+    end;
+    pat
+  in
 
-  group#read filename;
-  { site_title = title#get;
-    bar_pages = List.map (fun (f, t) -> { file = f; title = t }) pages#get;
-    extra_static = extra_static#get;
-    exports = exports#get;
-    default_template = default_template#get;
-    pages_templates = pages_templates#get;
-    dir_perm = dir_perm#get;
-    file_perm = file_perm#get
-  }
+  let get_rule (toml: Otoml.t): Rule.t =
+    let source = Otoml.find toml get_pat ["source"] in
+    let target = Otoml.find toml (
+      get_pat ~check_domain:(fun dom ->
+        if AS.Set.subset dom (Pat.dom source) then Ok ()
+        else Error (fmt "uses variables that do not exist in the corresponding source pattern")
+      )
+    ) ["target"] in
+    let template = Otoml.find_opt toml Otoml.get_string ["template"] in
+    let runner =
+      match Otoml.find toml Otoml.get_string ["kind"] with
+      | "external_command" ->
+        let cmd = Otoml.find toml (
+          get_pat ~check_domain:(fun dom ->
+            if AS.Set.subset dom (AS.Set.of_list ["source"]) then Ok ()
+            else Error (fmt "'command' can only use the $(source) variable")
+          )
+        ) ["command"] in
+        Rule.External_command { cmd }
+      | "builtin_markdown" ->
+        Rule.Builtin_markdown
+      | kind ->
+        raise (Otoml.Type_error (fmt "Unknown rule kind: %s" kind))
+    in
+    { source; target; template; runner }
+  in
+
+  let* toml =
+    Otoml.Parser.from_file_result filename
+    |> Result.map_error (fun msg ->
+      fmt "Could not parse %s as a toml file:\n%s" filename msg
+    )
+  in
+  let* title = Otoml.find_result toml Otoml.get_string ["title"] in
+  let* header = Otoml.find_result toml Otoml.(get_array get_string) ["header"] in
+  let* page_title = Otoml.find_result toml (Otoml.get_table_values Otoml.get_string) ["page_title"] in
+  let* rules = Otoml.find_result toml (Otoml.get_array get_rule) ["rules"] in
+
+  let page_title = List.map (fun (file, title) -> { title; file }) page_title in
+  Ok { title; header; page_title; rules }

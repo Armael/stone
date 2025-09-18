@@ -1,119 +1,82 @@
-(* Copyright (c) 2013 Armaël Guéneau
+(* Copyright (c) 2013-2025 Armaël Guéneau
 
    See the file LICENSE for copying permission.
 *)
 
-open Cow
 open Util
-open Params
 
-let custom_exporter command = fun file ->
-  let command = Str.global_replace
-    (Str.regexp "%{file}%")
-    (Filename.quote file)
-    command in
-  let cin = Unix.open_process_in command in
-  let output = Buffer.create 800 in
-  (try
-    while true do
-      Buffer.add_string output (input_line cin);
-      Buffer.add_char output '\n'
-    done
-  with End_of_file -> ());
-  ignore (Unix.close_process_in cin);
-  output
-  |> Buffer.contents
+let template_data ~title ~page_title ~bar ~content ~path_to_root () = [
+    "SITE_TITLE", title;
+    "PAGE_TITLE", page_title;
+    "BAR", bar;
+    "CONTENT", content;
+    "PATH_TO_ROOT", path_to_root;
+  ]
 
-let markdown_exporter = fun file ->
-  string_dump file
-  |> Omd.of_string
-  |> Omd.to_html
+let template_keys =
+  (* hackish *)
+  List.map fst (
+    template_data ~title:"" ~page_title:"" ~bar:"" ~content:"" ~path_to_root:"" ()
+  )
 
-let targets conf pages =
-  let exports =
-    (List.map (fun (suf, exp) -> (suf, custom_exporter exp)) conf.Conf.exports)
-    @ [ (".md", markdown_exporter);
-        (".markdown", markdown_exporter) ] in
-  List.fold_left (fun targets page ->
-    try
-      let (suf, exp) = List.find ((Filename.check_suffix page) % fst)
-        exports in
-      (page, ((Filename.chop_suffix page suf) ^ ".html", exp))::targets
-    with Not_found -> targets
-  ) [] pages
-
-let bar ?current bar_pages backpath targets =
+let bar ~(current: string) ~(path_to_root: string) (items: Conf.page list) =
   let open Conf in
-  let maybe_equal opt x = match opt with
-    | None -> false
-    | Some y -> x = y in
-  let item {file = f; title = t} =
-    let link =
-      (try
-        fst (List.assoc f targets)
-       with Not_found -> f) in
-    let link = backpath /^ link in
-    if maybe_equal current f then (
+  let open Cow in
+  let mk_item {file; title} =
+    let link = path_to_root ^ file in
+    if current = file then (
       Xml.tag "li" ~attrs:["class", "current"] (
         Xml.tag "a" ~attrs:["href", link] (
-          Xml.string t
+          Xml.string title
         )
       )
     ) else (
       Xml.tag "li" (
         Xml.tag "a" ~attrs:["href", link] (
-          Xml.string t
+          Xml.string title
         )
       )
     )
   in
   Xml.tag "div" ~attrs:["id", "bar"] (
     Xml.tag "ul" (
-      Xml.list (List.map item bar_pages)
+      Xml.list (List.map mk_item items)
     )
   ) |> Xml.to_string
 
-let page folder template conf targets filename =
-  let open Conf in
-  let filepath = filename |> Filename.dirname in
-  let backpath = gen_backpath (depth filepath) in
+let page
+    (folder: string)
+    (template: Template.t)
+    (conf: Conf.t)
+    (source: string)
+    (target: string)
+    (content: string)
+  =
+  let page_title path =
+    match List.find (fun (p: Conf.page) -> p.file = path) conf.page_title with
+    | p -> p.title
+    | exception Not_found ->
+      Filename.remove_extension (Filename.basename target)
+  in
 
-  let in_file = folder /^ pages /^ filename in
-  try
-    let (out_file, exporter) = List.assoc filename targets in
-    let out_file = folder /^ site /^ out_file in
-    let out_path = Filename.dirname out_file in
-    mkpath out_path conf.dir_perm;
+  let path_to_root = gen_backpath (depth source - 1) in
 
-    let html_content = exporter in_file in
-    let bar_item =
-      (try let it = (List.find (fun x -> x.file = filename)
-                       conf.bar_pages) in
-           Some it
-       with Not_found -> None) in
-    let current = match bar_item with
-      | Some it -> Some it.file
-      | None -> None in
-    let page_title = match bar_item with
-      | Some it -> it.title
-      | None -> Filename.remove_extension (Filename.basename filename)
-    in
-    let css_path = backpath  /^ static /^ css in
-    let css =
-      Xml.tag "link"
-        ~attrs:[("href", css_path); ("type", "text/css"); ("rel", "stylesheet")]
-        Xml.empty
-      |> Xml.to_string
-    in
-    let html_page = Template.fill template
-      conf.site_title page_title
-      css
-      (bar ?current conf.bar_pages backpath targets)
-      html_content in
-    dump_string conf.file_perm out_file html_page
+  let bar =
+    bar ~current:target ~path_to_root
+      (List.map (fun file -> Conf.{ file; title = page_title file }) conf.header)
+  in
 
-  with Not_found ->
-    let out_file = folder /^ site /^ filename in
-    let out_path = Filename.dirname out_file in
-    mkpath out_path conf.dir_perm;
-    copy_bin_file conf.file_perm in_file out_file
+  let html_page = Template.fill template (
+    template_data
+      ~title:conf.title
+      ~page_title:(page_title target)
+      ~bar
+      ~content
+      ~path_to_root
+      ()
+  )
+  in
+
+  let target_path = folder /^ "site" /^ target in
+  mkpath_for target_path;
+  write_file ~path:target_path html_page

@@ -1,45 +1,32 @@
-(* Copyright (c) 2013 Armaël Guéneau
+(* Copyright (c) 2013-2025 Armaël Guéneau
 
    See the file LICENSE for copying permission.
 *)
 
-let die msg =
-  print_endline msg;
-  exit 1
+let file_perm = 0o644
+let dir_perm = 0o755
 
-let open_wr_flags = [Open_creat; Open_trunc; Open_text; Open_wronly]
 let open_wr_bin_flags = [Open_creat; Open_trunc; Open_binary; Open_wronly]
 
-let dump_string perm filename s =
-  let chan = open_out_gen open_wr_flags perm filename in
-  output_string chan s;
-  close_out chan
+let read_file path =
+  In_channel.with_open_bin path In_channel.input_all
 
-let string_dump filename =
-  let chan = open_in filename in
-  let len = in_channel_length chan in
-  let b = Bytes.make (len+1) '\n' in
-  ignore (input chan b 0 len);
-  close_in chan;
-  Bytes.to_string b
+let write_file ~path contents =
+  Out_channel.with_open_gen open_wr_bin_flags file_perm path @@ fun cout ->
+  Out_channel.output_string cout contents
 
-let copy_bin_file perm f1 f2 =
-  let c1 = open_in_bin f1 in
-  let c2 = open_out_gen open_wr_bin_flags perm f2 in
-  (try
-     while true do
-       output_byte c2 (input_byte c1)
-     done
-   with End_of_file -> ());
-  close_in c1;
-  close_out c2
-
-let list_of_array a =
-  let l = ref [] in
-  for i = 0 to Array.length a - 1 do
-    l := a.(i) :: !l
-  done;
-  !l
+let copy_bin_file f1 f2 =
+  let buf = Bytes.create 4096 in
+  let rec copy cin cout =
+    let read = In_channel.input cin buf 0 (Bytes.length buf) in
+    if read > 0 then (
+      Out_channel.output_substring cout (Bytes.unsafe_to_string buf) 0 read;
+      copy cin cout
+    )
+  in
+  In_channel.with_open_bin f1 @@ fun cin ->
+  Out_channel.with_open_gen open_wr_bin_flags file_perm f2 @@ fun cout ->
+  copy cin cout
 
 let reduce f = function
   | [] -> raise (Invalid_argument "Empty list")
@@ -108,18 +95,25 @@ let subdirectories dir =
   |> Array.to_list
   |> List.filter (fun s -> Sys.is_directory (dir /^ s))
 
+let mkdir name =
+  Unix.mkdir name dir_perm
+
 (* Tries to create a directory. In case of failure, do nothing *)
-let try_mkdir name perm =
-  try Unix.mkdir name perm with
+let try_mkdir name =
+  try mkdir name with
     Unix.Unix_error _ -> ()
 
-(* Creates all the folders needed to write in path.
+(* Creates all the folders needed to write in the directory [path].
    Similar to a 'mkdir -p'. *)
-let rec mkpath path perm =
+let rec mkpath path =
   if not (Sys.file_exists path) then (
-    mkpath (Filename.dirname path) perm;
-    try_mkdir path perm
+    mkpath (Filename.dirname path);
+    try_mkdir path
   )
+
+(* Creates the required directories to write to the file [file_path] *)
+let mkpath_for file_path =
+  mkpath (Filename.dirname file_path)
 
 (* Count the number of folders in the given path.
 
@@ -140,29 +134,17 @@ let depth path =
 
 (* Generate a path to depth number of folder backwards.
 
-   Example : 3 -> ../../../
+   Example:
+   - 0 -> ""
+   - 3 -> "../../../"
 *)
 let gen_backpath depth =
-  let parent_len = String.length Filename.parent_dir_name in
-  let sep_len = String.length Filename.dir_sep in
-  let back_len = parent_len + sep_len in
-  let path = Bytes.make (depth * back_len) ' ' in
-  for i = 0 to depth - 1 do
-    Bytes.blit_string Filename.parent_dir_name 0 path (back_len * i) parent_len;
-    Bytes.blit_string Filename.dir_sep 0 path (back_len * i + parent_len) sep_len;
-  done;
-  Bytes.to_string path
+  String.concat "" @@ List.init depth (fun _ -> "../")
 
-let rec map_some f = function
-  | [] -> []
-  | x::xs -> match f x with
-    | None -> map_some f xs
-    | Some y -> y::(map_some f xs)
+let println =
+  Printf.kfprintf (fun cout -> Printf.fprintf cout "\n%!") stdout
 
-let option_map f = function
-  | None -> None
-  | Some x -> Some (f x)
-
-let (|>) x f = f x
-let (@@) f x = f x
-let (%) f g = fun x -> f (g x)
+let unwrap_result (res: ('a, string) Result.t) =
+  match res with
+  | Ok x -> x
+  | Error msg -> println "%s" msg; exit 1
