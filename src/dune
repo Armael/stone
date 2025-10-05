@@ -6,4 +6,14 @@
 (executable
   (name stone)
   (public_name stone)
-  (libraries cow crunch inotify str bos otoml astring cmarkit))
+  (libraries
+   cow
+   crunch
+   (select stone_inotify.ml from
+    (inotify -> stone_inotify.real.ml)
+    (        -> stone_inotify.fake.ml))
+   str
+   bos
+   otoml
+   astring
+   cmarkit))
