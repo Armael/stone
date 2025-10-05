@@ -13,7 +13,7 @@ depends: [
   "crunch" {build}
   "cow" {>= "2.0.0"}
   "base-bytes"
-  "inotify" {>= "2.3"}
+  "inotify" {>= "2.3" & os = "linux"}
   "cmarkit" {>= "0.3.0"}
   "bos" {>= "0.2.0"}
   "astring" {>= "0.8"}

@@ -5,6 +5,8 @@
 
 open Util
 
+module Inotify = Stone_inotify
+
 let get_data filename =
   match Data.read filename with
   | None -> println "Data file not found: %s" filename; exit 1

@@ -1,5 +1,7 @@
 open Util
 
+module Inotify = Stone_inotify
+
 type rel_path = string
 type handler = Inotify.event -> unit
 type handler_with_rel_path = rel_path -> Inotify.event -> unit
