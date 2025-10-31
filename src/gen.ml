@@ -56,7 +56,7 @@ let page
     match List.find (fun (p: Conf.page) -> p.file = path) conf.page_title with
     | p -> p.title
     | exception Not_found ->
-      Filename.remove_extension (Filename.basename target)
+      Filename.remove_extension (Filename.basename path)
   in
 
   let path_to_root = gen_backpath (depth source - 1) in
