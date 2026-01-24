@@ -19,7 +19,7 @@ let precompute (keys: string list) (s: string) =
     | Str.Text x -> Str.Text x
     | Str.Delim x ->
       (* remove the $ delimiters *)
-      Str.Delim (Astring.String.with_range ~first:1 ~len:(String.length x - 2) x)
+        Str.Delim (String.sub x 1 (String.length x - 2))
   )
 
 let fill (template: t) (data: (string * string) list) =

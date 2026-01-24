@@ -3,9 +3,10 @@
    See the file LICENSE for copying permission.
 *)
 
-module Pat = Bos.Pat
-module AS = Astring.String
-let (let*) = Result.bind
+open Result.Syntax
+
+module String_set = Set.Make(String)
+
 let fmt = Printf.sprintf
 
 type page = {
@@ -22,16 +23,16 @@ type t = {
 
 let parse_conf filename =
   let get_pat
-      ?(check_domain: AS.Set.t -> (unit, string) Result.t = fun _ -> Ok ())
+      ?(check_domain: String_set.t -> (unit, string) Result.t = fun _ -> Ok ())
       (toml: Otoml.t)
-    : Pat.t
+    : Bos.Pat.t
     =
     let str = Otoml.get_string toml in
-    let pat = match Pat.of_string str with
+    let pat = match Bos.Pat.of_string str with
       | Ok p -> p
       | Error (`Msg msg) -> raise (Otoml.Type_error (fmt "Failed to parse pattern '%s': %s" str msg))
     in
-    begin match check_domain (Pat.dom pat) with
+    begin match check_domain (Bos.Pat.dom pat |> Astring.String.Set.to_stdlib_set) with
       | Ok () -> ()
       | Error msg -> raise (Otoml.Type_error (fmt "Invalid pattern '%s': %s" str msg))
     end;
@@ -42,7 +43,7 @@ let parse_conf filename =
     let source = Otoml.find toml get_pat ["source"] in
     let target = Otoml.find toml (
       get_pat ~check_domain:(fun dom ->
-        if AS.Set.subset dom (Pat.dom source) then Ok ()
+        if String_set.subset dom (Bos.Pat.dom source |> Astring.String.Set.to_stdlib_set) then Ok ()
         else Error (fmt "uses variables that do not exist in the corresponding source pattern")
       )
     ) ["target"] in
@@ -52,7 +53,7 @@ let parse_conf filename =
       | "external_command" ->
         let cmd = Otoml.find toml (
           get_pat ~check_domain:(fun dom ->
-            if AS.Set.subset dom (AS.Set.of_list ["source"]) then Ok ()
+            if String_set.subset dom (String_set.of_list ["source"]) then Ok ()
             else Error (fmt "'command' can only use the $(source) variable")
           )
         ) ["command"] in

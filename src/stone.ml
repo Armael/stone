@@ -32,7 +32,7 @@ let init_folder folder =
 
   (* Write the static files *)
   Data.file_list
-  |> List.filter (Astring.String.is_prefix ~affix:"static/")
+  |> List.filter (String.starts_with ~prefix:"static/")
   |> List.iter (fun f ->
     let target = folder /^ "pages" /^ f in
     mkpath_for target;

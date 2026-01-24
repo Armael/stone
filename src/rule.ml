@@ -1,17 +1,17 @@
-module Pat = Bos.Pat
+module String_map = Map.Make(String)
 
 type runner =
   | External_command of {
     (* dom(cmd) included in {'source'} *)
-    cmd: Pat.t;
+    cmd: Bos.Pat.t;
   }
   | Builtin_markdown
 
 type t = {
   runner: runner;
-  source: Pat.t;
+  source: Bos.Pat.t;
   (* dom(target) included in dom(source) *)
-  target: Pat.t;
+  target: Bos.Pat.t;
   template: string option;
 }
 
@@ -23,11 +23,11 @@ type result = {
 
 (* runners implementation *)
 
-let external_command (cmd: Pat.t) (file: string): string =
+let external_command (cmd: Bos.Pat.t) (file: string): string =
   let fullcmd =
-    Pat.format
+    Bos.Pat.format
       ~undef:(fun _ -> assert false (* we validated the domain of cmd at parsing time *))
-      (Astring.String.Map.of_list ["source", file])
+      ((String_map.of_list ["source", file]) |> Astring.String.Map.of_stdlib_map)
       cmd
   in
   let cin = Unix.open_process_in fullcmd in
@@ -57,8 +57,8 @@ let markdown (file: string): string =
 (* *)
 
 let matches (r: t) (filename: string): string option =
-  Pat.query r.source filename
-  |> Option.map (fun vars -> Pat.format vars r.target)
+  Bos.Pat.query r.source filename
+  |> Option.map (fun vars -> Bos.Pat.format vars r.target)
 
 let run (r: t) (filename: string): string =
   match r.runner with
