@@ -1,3 +1,5 @@
-(lang dune 1.11)
+(lang dune 3.0)
+
 (name stone)
-(explicit_js_mode)
+
+(implicit_transitive_deps false)

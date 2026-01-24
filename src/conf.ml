@@ -5,7 +5,6 @@
 
 module Pat = Bos.Pat
 module AS = Astring.String
-let (let*) = Result.bind
 let fmt = Printf.sprintf
 
 type page = {
