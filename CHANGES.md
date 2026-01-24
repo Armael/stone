@@ -1,3 +1,9 @@
+# v0.6.1
+
+- Fix a bug in the generation of link names in the header bar.
+- Add support for non-Linux operating systems. Watch mode is disabled on
+  these systems. (by @kit-ty-kate)
+
 # v0.6
 
 This is a major overhaul release, which includes a number of breaking changes.
